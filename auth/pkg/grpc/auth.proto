@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/MaksKazantsev/SSO/auth/pkg";
+
+service User {
+  rpc Register(RegisterReq) returns(RegisterRes);
+  rpc Login(LoginReq) returns(LoginRes);
+  rpc Reset(ResetReq) returns(google.protobuf.Empty);
+}
+
+message RegisterReq {
+  string Username = 1;
+  string Password = 2;
+  string Email = 3;
+}
+
+message RegisterRes {
+  string UUID = 1;
+  string Token = 2;
+}
+
+message LoginReq {
+  string Email = 1;
+  string Password = 2;
+}
+
+message LoginRes {
+  string Token = 1;
+}
+
+message ResetReq {
+  string OldPassword = 1;
+  string NewPassword =2;
+  string Token = 3;
+}

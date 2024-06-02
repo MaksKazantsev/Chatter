@@ -2,6 +2,7 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"github.com/goccy/go-yaml"
 	"github.com/joho/godotenv"
 	"os"
@@ -19,6 +20,10 @@ type Postgres struct {
 	Password string `yaml:"password"`
 	User     string `yaml:"user"`
 	Name     string `yaml:"name"`
+}
+
+func (p *Postgres) GetAddr() string {
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", p.User, p.Password, p.Host, p.Port, p.Name)
 }
 
 func MustInit() *Config {
