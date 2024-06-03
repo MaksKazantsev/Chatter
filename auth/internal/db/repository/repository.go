@@ -37,7 +37,7 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 
 func (p *Postgres) Login(ctx context.Context, req models.LogReq) (db.LoginInfo, error) {
 	var info db.LoginInfo
-	q := `SELECT uuid, password FROM users WHERE email = $2`
+	q := `SELECT uuid FROM users WHERE email = $1`
 
 	err := p.QueryRowx(q, req.Email).StructScan(&info)
 	if err != nil {

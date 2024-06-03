@@ -9,8 +9,8 @@ func HashPassword(password string) (string, error) {
 	}
 	return string(pass), nil
 }
-func ComparePass(provided, current string) error {
-	if err := bcrypt.CompareHashAndPassword([]byte(provided), []byte(current)); err != nil {
+func ComparePass(hashed, current string) error {
+	if err := bcrypt.CompareHashAndPassword([]byte(hashed), []byte(current)); err != nil {
 		return NewError("wrong password provided", ErrBadRequest)
 	}
 	return nil

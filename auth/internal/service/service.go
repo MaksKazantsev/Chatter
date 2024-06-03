@@ -31,7 +31,7 @@ func (s *service) Register(ctx context.Context, req models.RegReq) (models.RegRe
 	// hashing password
 	hashed, err := utils.HashPassword(req.Password)
 	if err != nil {
-		return models.RegRes{}, fmt.Errorf("failed to hash password: %w", err)
+		return models.RegRes{}, err
 	}
 	req.Password = hashed
 
@@ -45,7 +45,7 @@ func (s *service) Register(ctx context.Context, req models.RegReq) (models.RegRe
 	// generating token
 	token, err := utils.NewToken(req.UUID)
 	if err != nil {
-		return models.RegRes{}, fmt.Errorf("failed to generate token: %w", err)
+		return models.RegRes{}, err
 	}
 
 	return models.RegRes{
@@ -58,15 +58,21 @@ func (s *service) Login(ctx context.Context, req models.LogReq) (string, error) 
 	// logging
 	log.GetLogger(ctx).Debug("usecase layer success ✔")
 
-	// login
-	info, err := s.repo.Login(ctx, req)
+	// get password
+	pass, err := s.repo.GetPasswordByEmail(ctx, req.Email)
 	if err != nil {
 		return "", fmt.Errorf("repo error: %w", err)
 	}
 
 	// compare passwords
-	if err = utils.ComparePass(req.Password, info.Password); err != nil {
+	if err = utils.ComparePass(pass, req.Password); err != nil {
 		return "", fmt.Errorf("error: %w", err)
+	}
+
+	// login
+	info, err := s.repo.Login(ctx, req)
+	if err != nil {
+		return "", fmt.Errorf("repo error: %w", err)
 	}
 
 	// generating token
@@ -81,8 +87,10 @@ func (s *service) Reset(ctx context.Context, req models.ResReq) error {
 	// logging
 	log.GetLogger(ctx).Debug("usecase layer success ✔")
 
+	// parse token
 	claims, err := utils.ParseToken(req.Token)
 	if err != nil {
+
 		return fmt.Errorf("failed to parse token: %w", err)
 	}
 
@@ -93,7 +101,7 @@ func (s *service) Reset(ctx context.Context, req models.ResReq) error {
 	}
 
 	// compare password
-	if err = utils.ComparePass(req.Password, password); err != nil {
+	if err = utils.ComparePass(password, req.OldPassword); err != nil {
 		return fmt.Errorf("error: %w", err)
 	}
 
@@ -103,6 +111,7 @@ func (s *service) Reset(ctx context.Context, req models.ResReq) error {
 		return fmt.Errorf("failed to hash password: %w", err)
 	}
 
+	// reset password
 	if err = s.repo.Reset(ctx, hashed, claims["id"].(string)); err != nil {
 		return fmt.Errorf("repo error: %w", err)
 	}

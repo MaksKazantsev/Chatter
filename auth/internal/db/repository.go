@@ -16,10 +16,10 @@ type Auth interface {
 	Reset(ctx context.Context, password, uuid string) error
 }
 type Internal interface {
+	GetPasswordByEmail(ctx context.Context, email string) (string, error)
 	GetPasswordByUUID(ctx context.Context, uuid string) (string, error)
 }
 
 type LoginInfo struct {
-	UUID     string
-	Password string
+	UUID string
 }
