@@ -8,8 +8,8 @@ import (
 )
 
 type UserAuth interface {
-	Register(ctx context.Context, req models.SignupReq) (string, error)
-	Login(ctx context.Context, req models.LoginReq) (string, error)
+	Register(ctx context.Context, req models.SignupReq) (string, string, error)
+	Login(ctx context.Context, req models.LoginReq) (string, string, error)
 	Reset(ctx context.Context, req models.ResetReq) error
 }
 
@@ -18,15 +18,16 @@ type userAuthCl struct {
 	c  utils.Converter
 }
 
-func (u userAuthCl) Register(ctx context.Context, req models.SignupReq) (string, error) {
+func (u userAuthCl) Register(ctx context.Context, req models.SignupReq) (string, string, error) {
 	res, err := u.cl.Register(ctx, u.c.RegReqToPb(req))
+
 	if err != nil {
 		return "", utils.GRPCErrorToError(err)
 	}
 	return res.Token, nil
 }
 
-func (u userAuthCl) Login(ctx context.Context, req models.LoginReq) (string, error) {
+func (u userAuthCl) Login(ctx context.Context, req models.LoginReq) (string, string, error) {
 	res, err := u.cl.Login(ctx, u.c.LogReqToPb(req))
 	if err != nil {
 		return "", utils.GRPCErrorToError(err)

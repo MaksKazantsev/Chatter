@@ -1,10 +1,12 @@
 package models
 
 type RegRes struct {
-	UUID  string `json:"uuid"`
-	Token string `json:"-"`
+	UUID         string `json:"uuid"`
+	RefreshToken string `json:"refreshToken"`
+	AccessToken  string `json:"accessToken"`
 }
 
 type LogRes struct {
-	Token string `json:"-"`
+	AccessToken  string `json:"accessToken"`
+	RefreshToken string `json:"refreshToken"`
 }

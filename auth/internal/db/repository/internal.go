@@ -5,15 +5,18 @@ import (
 	"github.com/MaksKazantsev/SSO/auth/internal/utils"
 )
 
-func (p *Postgres) GetPasswordByEmail(ctx context.Context, email string) (string, error) {
-	q := `SELECT password FROM users WHERE email = $1`
+func (p *Postgres) GetHashAndID(ctx context.Context, email string) (string, string, error) {
+	q := `SELECT password, uuid FROM users WHERE email = $1`
 
-	var password string
-
-	if err := p.QueryRowx(q, email).Scan(&password); err != nil {
-		return "", utils.NewError("user with this email not found", utils.ErrNotFound)
+	var res struct {
+		password string
+		uuid     string
 	}
-	return password, nil
+
+	if err := p.QueryRowx(q, email).Scan(&res); err != nil {
+		return "", "", utils.NewError("user with this email not found", utils.ErrNotFound)
+	}
+	return res.password, res.uuid, nil
 }
 
 func (p *Postgres) GetPasswordByUUID(ctx context.Context, uuid string) (string, error) {

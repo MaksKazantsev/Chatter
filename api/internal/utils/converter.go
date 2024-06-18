@@ -11,7 +11,7 @@ type Converter interface {
 }
 
 func NewConverter() Converter {
-	return converter{}
+	return &converter{}
 }
 
 type converter struct {

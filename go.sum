@@ -1,7 +1,5 @@
-github.com/MaksKazantsev/SSO/auth v0.0.0-20240603194214-be99e696f376 h1:WyB724QLLyBq6x5J/fB5TdKX7+gerXXCddpYZ34IPD0=
-github.com/MaksKazantsev/SSO/auth v0.0.0-20240603194214-be99e696f376/go.mod h1:eeFJFZ1/BBw7OaOl19uUGRzTOz+ySv2p3Z9W8Yr1BIc=
-github.com/google/go-cmp v0.6.0 h1:ofyhxvXcZhMsU5ulbFiLKl/XBFqE1GSq7atu8tAmTRI=
-github.com/google/go-cmp v0.6.0/go.mod h1:17dUlkBOakJ0+DkrSSNjCkIjxS6bF9zb3elmeNGIjoY=
+github.com/MaksKazantsev/SSO/auth v0.0.0-20240607214121-3e6991e2a1e7 h1:jJEHu0F6OJHWqdiB6ZAnRnqxqqDcQRilv2VBZKMgH0g=
+github.com/MaksKazantsev/SSO/auth v0.0.0-20240607214121-3e6991e2a1e7/go.mod h1:eeFJFZ1/BBw7OaOl19uUGRzTOz+ySv2p3Z9W8Yr1BIc=
 golang.org/x/net v0.22.0 h1:9sGLhx7iRIHEiX0oAJ3MRZMUCElJgy7Br1nO+AMN3Tc=
 golang.org/x/net v0.22.0/go.mod h1:JKghWKKOSdJwpW2GEx0Ja7fmaKnMsbu+MWVZTokSYmg=
 golang.org/x/sys v0.20.0 h1:Od9JTbYCk261bKm4M/mw7AklTlFYIa0bIp9BgSm1S8Y=

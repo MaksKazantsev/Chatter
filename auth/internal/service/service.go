@@ -12,7 +12,7 @@ import (
 
 type Service interface {
 	Register(ctx context.Context, req models.RegReq) (models.RegRes, error)
-	Login(ctx context.Context, req models.LogReq) (string, error)
+	Login(ctx context.Context, req models.LogReq) (string, string, error)
 	Reset(ctx context.Context, req models.ResReq) error
 }
 
@@ -42,45 +42,54 @@ func (s *service) Register(ctx context.Context, req models.RegReq) (models.RegRe
 		return models.RegRes{}, fmt.Errorf("repo error: %w", err)
 	}
 
-	// generating token
-	token, err := utils.NewToken(req.UUID)
+	// generating tokens
+	rToken, err := utils.NewToken(req.UUID, utils.REFRESH)
+	if err != nil {
+		return models.RegRes{}, err
+	}
+	aToken, err := utils.NewToken(req.UUID, utils.ACCESS)
 	if err != nil {
 		return models.RegRes{}, err
 	}
 
 	return models.RegRes{
-		UUID:  req.UUID,
-		Token: token,
+		UUID:         req.UUID,
+		RefreshToken: rToken,
+		AccessToken:  aToken,
 	}, nil
 }
 
-func (s *service) Login(ctx context.Context, req models.LogReq) (string, error) {
+func (s *service) Login(ctx context.Context, req models.LogReq) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("usecase layer success ✔")
 
 	// get password
-	pass, err := s.repo.GetPasswordByEmail(ctx, req.Email)
+	hash, id, err := s.repo.GetHashAndID(ctx, req.Email)
 	if err != nil {
-		return "", fmt.Errorf("repo error: %w", err)
+		return "", " ", fmt.Errorf("repo error: %w", err)
 	}
 
 	// compare passwords
-	if err = utils.ComparePass(pass, req.Password); err != nil {
-		return "", fmt.Errorf("error: %w", err)
+	if err = utils.ComparePass(hash, req.Password); err != nil {
+		return "", " ", fmt.Errorf("error: %w", err)
 	}
 
 	// login
-	info, err := s.repo.Login(ctx, req)
+	err = s.repo.Login(ctx, req)
 	if err != nil {
-		return "", fmt.Errorf("repo error: %w", err)
+		return "", " ", fmt.Errorf("repo error: %w", err)
 	}
 
 	// generating token
-	token, err := utils.NewToken(info.UUID)
+	rToken, err := utils.NewToken(id, utils.REFRESH)
 	if err != nil {
-		return "", fmt.Errorf("failed to generate token: %w", err)
+		return " ", " ", err
 	}
-	return token, nil
+	aToken, err := utils.NewToken(id, utils.ACCESS)
+	if err != nil {
+		return " ", " ", err
+	}
+	return rToken, aToken, nil
 }
 
 func (s *service) Reset(ctx context.Context, req models.ResReq) error {

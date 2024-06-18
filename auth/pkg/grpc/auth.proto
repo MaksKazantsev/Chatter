@@ -18,7 +18,8 @@ message RegisterReq {
 
 message RegisterRes {
   string UUID = 1;
-  string Token = 2;
+  string AccessToken = 2;
+  string RefreshToken = 3;
 }
 
 message LoginReq {
@@ -27,7 +28,8 @@ message LoginReq {
 }
 
 message LoginRes {
-  string Token = 1;
+  string AccessToken = 1;
+  string RefreshToken = 2;
 }
 
 message ResetReq {

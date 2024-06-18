@@ -3,13 +3,16 @@ module github.com/MaksKazantsev/SSO/api
 go 1.22.1
 
 require (
-	github.com/MaksKazantsev/SSO/auth v0.0.0-20240603194214-be99e696f376
+	github.com/MaksKazantsev/SSO/auth v0.0.0-20240607214121-3e6991e2a1e7
+	github.com/goccy/go-yaml v1.11.3
+	github.com/gofiber/fiber/v2 v2.52.4
+	github.com/joho/godotenv v1.5.1
 	google.golang.org/grpc v1.64.0
 )
 
 require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
-	github.com/gofiber/fiber/v2 v2.52.4 // indirect
+	github.com/fatih/color v1.17.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -22,6 +25,7 @@ require (
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
 )

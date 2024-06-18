@@ -24,9 +24,9 @@ func NewRepository(db *sqlx.DB) *Postgres {
 }
 
 func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
-	q := `INSERT INTO users (uuid,email,username,password) VALUES($1,$2,$3,$4)`
+	q := `INSERT INTO users (uuid,email,username,password,refresh) VALUES($1,$2,$3,$4,$5)`
 
-	_, err := p.Exec(q, req.UUID, req.Email, req.Username, req.Password)
+	_, err := p.Exec(q, req.UUID, req.Email, req.Username, req.Password, req.Refresh)
 	if err != nil {
 		return utils.NewError("user with this email already exists", utils.ErrBadRequest)
 	}
@@ -35,20 +35,19 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 	return nil
 }
 
-func (p *Postgres) Login(ctx context.Context, req models.LogReq) (db.LoginInfo, error) {
-	var info db.LoginInfo
-	q := `SELECT uuid FROM users WHERE email = $1`
+func (p *Postgres) Login(ctx context.Context, req models.LogReq) error {
+	q := `UPDATE users SET refresh = $1 WHERE email = $2`
 
-	err := p.QueryRowx(q, req.Email).StructScan(&info)
+	_, err := p.Exec(q, req.Refresh, req.Email)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return db.LoginInfo{}, utils.NewError("user with this email not found", utils.ErrNotFound)
+			return utils.NewError("user with this email not found", utils.ErrNotFound)
 		}
-		return db.LoginInfo{}, utils.NewError(err.Error(), utils.ErrInternal)
+		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
 	log.GetLogger(ctx).Debug("db layer success")
-	return info, nil
+	return nil
 }
 
 func (p *Postgres) Reset(ctx context.Context, password, uuid string) error {

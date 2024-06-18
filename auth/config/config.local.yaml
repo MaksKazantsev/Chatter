@@ -2,7 +2,7 @@ port: 3001
 env: local
 db:
   port: 4001
-  host: 127.0.0.1
+  host: localhost
   password: postgres
   user: postgres
   name: auth

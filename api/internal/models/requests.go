@@ -14,4 +14,5 @@ type LoginReq struct {
 type ResetReq struct {
 	OldPassword string `json:"oldPassword"`
 	NewPassword string `json:"newPassword"`
+	Token       string `json:"token"`
 }

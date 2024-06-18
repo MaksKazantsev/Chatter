@@ -42,11 +42,11 @@ func (s *server) Login(ctx context.Context, req *pkg.LoginReq) (*pkg.LoginRes, e
 	if err := s.validator.ValidateLogReq(req); err != nil {
 		return nil, err
 	}
-	token, err := s.service.Login(log.WithLogger(ctx, s.log), s.converter.LoginReqToService(req))
+	rToken, aToken, err := s.service.Login(log.WithLogger(ctx, s.log), s.converter.LoginReqToService(req))
 	if err != nil {
 		return nil, utils.HandleError(err)
 	}
-	return s.converter.LoginResToPb(token), nil
+	return s.converter.LoginResToPb(aToken, rToken), nil
 }
 
 func (s *server) Reset(ctx context.Context, req *pkg.ResetReq) (*emptypb.Empty, error) {

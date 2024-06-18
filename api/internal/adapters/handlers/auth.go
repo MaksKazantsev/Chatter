@@ -30,3 +30,33 @@ func (a *Auth) Register(c *fiber.Ctx) error {
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": token})
 	return nil
 }
+
+func (a *Auth) Login(c *fiber.Ctx) error {
+	var body models.LoginReq
+	if err := c.BodyParser(&body); err != nil {
+		c.Status(http.StatusBadRequest)
+		return nil
+	}
+	token, err := a.cl.Login(c.Context(), body)
+	if err != nil {
+		code, msg := utils.HandleError(err)
+		_ = c.Status(code).SendString(msg)
+		return nil
+	}
+	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": token})
+	return nil
+}
+
+func (a *Auth) Reset(c *fiber.Ctx) error {
+	var body models.ResetReq
+	if err := c.BodyParser(&body); err != nil {
+		c.Status(http.StatusBadRequest)
+		return nil
+	}
+	if err := a.cl.Reset(c.Context(), body); err != nil {
+		code, msg := utils.HandleError(err)
+		_ = c.Status(code).SendString(msg)
+		return nil
+	}
+	return nil
+}

@@ -1,0 +1,5 @@
+env: local
+port: 3000
+host: localhost
+services:
+  authAddr: localhost:3001

@@ -12,7 +12,7 @@ type Converter interface {
 
 type ToPb interface {
 	RegResToPb(req models.RegRes) *pkg.RegisterRes
-	LoginResToPb(token string) *pkg.LoginRes
+	LoginResToPb(access, refresh string) *pkg.LoginRes
 }
 
 type ToService interface {
@@ -29,12 +29,13 @@ type converter struct {
 }
 
 func (c converter) RegResToPb(req models.RegRes) *pkg.RegisterRes {
-	return &pkg.RegisterRes{UUID: req.UUID, Token: req.Token}
+	return &pkg.RegisterRes{UUID: req.UUID, AccessToken: req.AccessToken, RefreshToken: req.RefreshToken}
 }
 
-func (c converter) LoginResToPb(token string) *pkg.LoginRes {
+func (c converter) LoginResToPb(access, refresh string) *pkg.LoginRes {
 	return &pkg.LoginRes{
-		Token: token,
+		AccessToken:  access,
+		RefreshToken: refresh,
 	}
 }
 
