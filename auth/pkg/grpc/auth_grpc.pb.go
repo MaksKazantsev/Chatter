@@ -25,7 +25,9 @@ const _ = grpc.SupportPackageIsVersion7
 type UserClient interface {
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterRes, error)
 	Login(ctx context.Context, in *LoginReq, opts ...grpc.CallOption) (*LoginRes, error)
-	Reset(ctx context.Context, in *ResetReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SendCode(ctx context.Context, in *SendReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	VerifyCode(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyRes, error)
+	Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -54,9 +56,27 @@ func (c *userClient) Login(ctx context.Context, in *LoginReq, opts ...grpc.CallO
 	return out, nil
 }
 
-func (c *userClient) Reset(ctx context.Context, in *ResetReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *userClient) SendCode(ctx context.Context, in *SendReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/User/Reset", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/User/SendCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) VerifyCode(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyRes, error) {
+	out := new(VerifyRes)
+	err := c.cc.Invoke(ctx, "/User/VerifyCode", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/Recovery", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +89,9 @@ func (c *userClient) Reset(ctx context.Context, in *ResetReq, opts ...grpc.CallO
 type UserServer interface {
 	Register(context.Context, *RegisterReq) (*RegisterRes, error)
 	Login(context.Context, *LoginReq) (*LoginRes, error)
-	Reset(context.Context, *ResetReq) (*emptypb.Empty, error)
+	SendCode(context.Context, *SendReq) (*emptypb.Empty, error)
+	VerifyCode(context.Context, *VerifyReq) (*VerifyRes, error)
+	Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -83,8 +105,14 @@ func (UnimplementedUserServer) Register(context.Context, *RegisterReq) (*Registe
 func (UnimplementedUserServer) Login(context.Context, *LoginReq) (*LoginRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedUserServer) Reset(context.Context, *ResetReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Reset not implemented")
+func (UnimplementedUserServer) SendCode(context.Context, *SendReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendCode not implemented")
+}
+func (UnimplementedUserServer) VerifyCode(context.Context, *VerifyReq) (*VerifyRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyCode not implemented")
+}
+func (UnimplementedUserServer) Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Recovery not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -135,20 +163,56 @@ func _User_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_Reset_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ResetReq)
+func _User_SendCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).Reset(ctx, in)
+		return srv.(UserServer).SendCode(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/User/Reset",
+		FullMethod: "/User/SendCode",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Reset(ctx, req.(*ResetReq))
+		return srv.(UserServer).SendCode(ctx, req.(*SendReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_VerifyCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).VerifyCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/VerifyCode",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).VerifyCode(ctx, req.(*VerifyReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_Recovery_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RecoveryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).Recovery(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/Recovery",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).Recovery(ctx, req.(*RecoveryReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -169,8 +233,16 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_Login_Handler,
 		},
 		{
-			MethodName: "Reset",
-			Handler:    _User_Reset_Handler,
+			MethodName: "SendCode",
+			Handler:    _User_SendCode_Handler,
+		},
+		{
+			MethodName: "VerifyCode",
+			Handler:    _User_VerifyCode_Handler,
+		},
+		{
+			MethodName: "Recovery",
+			Handler:    _User_Recovery_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
