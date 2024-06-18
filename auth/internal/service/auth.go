@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/MaksKazantsev/SSO/auth/internal/db"
 	"github.com/MaksKazantsev/SSO/auth/internal/log"
 	"github.com/MaksKazantsev/SSO/auth/internal/models"
 	"github.com/MaksKazantsev/SSO/auth/internal/utils"
@@ -11,13 +12,19 @@ import (
 	"strconv"
 )
 
-type Auth interface {
-	Register(ctx context.Context, req models.RegReq) (models.RegRes, error)
-	Login(ctx context.Context, req models.LogReq) (string, string, error)
-	Reset(ctx context.Context, req models.ResReq) error
+type Auth struct {
+	repo db.Auth
+	smtp utils.Smtp
 }
 
-func (s *service) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
+func NewAuth(repo db.Auth) *Auth {
+	return &Auth{
+		repo: repo,
+		smtp: utils.NewSmtp(),
+	}
+}
+
+func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -42,18 +49,18 @@ func (s *service) Register(ctx context.Context, req models.RegReq) (models.RegRe
 	}
 	req.Refresh = rToken
 
-	if err = s.repo.Register(ctx, req); err != nil {
+	if err = a.repo.Register(ctx, req); err != nil {
 		return models.RegRes{}, fmt.Errorf("repo error: %w", err)
 	}
 
 	code := strconv.Itoa(rand.Intn(9001) + 1000)
 
 	go func() {
-		if err = s.smtp.SendCode(code, req.Email); err != nil {
+		if err = a.smtp.SendCode(code, req.Email); err != nil {
 			fmt.Printf("smtp error: %v\n", err)
 		}
 	}()
-	if err = s.repo.EmailAddCode(ctx, code, req.Email); err != nil {
+	if err = a.repo.EmailAddCode(ctx, code, req.Email); err != nil {
 		return models.RegRes{}, fmt.Errorf("repo error: %w", err)
 	}
 	return models.RegRes{
@@ -63,13 +70,12 @@ func (s *service) Register(ctx context.Context, req models.RegReq) (models.RegRe
 	}, nil
 }
 
-func (s *service) Login(ctx context.Context, req models.LogReq) (string, string, error) {
+func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
 	// get password
-	fmt.Println(req.Email)
-	res, err := s.repo.GetHashAndID(ctx, req.Email)
+	res, err := a.repo.GetHashAndID(ctx, req.Email)
 	if err != nil {
 		return "", " ", fmt.Errorf("repo error: %w", err)
 	}
@@ -91,10 +97,29 @@ func (s *service) Login(ctx context.Context, req models.LogReq) (string, string,
 	req.Refresh = rToken
 
 	// login
-	err = s.repo.Login(ctx, req)
+	err = a.repo.Login(ctx, req)
 	if err != nil {
 		return "", " ", fmt.Errorf("repo error: %w", err)
 	}
 
 	return rToken, aToken, nil
+}
+
+func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
+
+	// code
+	code := strconv.Itoa(rand.Intn(9009) + 1000)
+
+	// send code
+	if err := a.smtp.SendCode(code, email); err != nil {
+		return fmt.Errorf("smtp error: %w", err)
+	}
+
+	// calling repo method
+	if err := a.repo.EmailAddCode(ctx, code, email); err != nil {
+		return fmt.Errorf("repo errpr: %w", err)
+	}
+	return nil
 }

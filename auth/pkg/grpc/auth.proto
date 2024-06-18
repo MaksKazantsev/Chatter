@@ -7,7 +7,9 @@ option go_package = "github.com/MaksKazantsev/SSO/auth/pkg";
 service User {
   rpc Register(RegisterReq) returns(RegisterRes);
   rpc Login(LoginReq) returns(LoginRes);
-  rpc Reset(ResetReq) returns(google.protobuf.Empty);
+  rpc SendCode(SendReq) returns(google.protobuf.Empty);
+  rpc VerifyCode(VerifyReq) returns(VerifyRes);
+  rpc Recovery(RecoveryReq) returns (google.protobuf.Empty);
 }
 
 message RegisterReq {
@@ -32,8 +34,22 @@ message LoginRes {
   string RefreshToken = 2;
 }
 
-message ResetReq {
-  string OldPassword = 1;
-  string NewPassword =2;
-  string Token = 3;
+message SendReq {
+  string Email = 1;
+}
+
+message VerifyReq {
+  string Code = 1;
+  string Email = 2;
+  string Type = 3;
+}
+
+message VerifyRes {
+  string AccessToken = 1;
+  string RefreshToken = 2;
+}
+
+message RecoveryReq {
+  string Email = 1;
+  string Password = 2;
 }

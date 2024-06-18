@@ -9,7 +9,6 @@ import (
 	"github.com/MaksKazantsev/SSO/auth/internal/utils/validator"
 	pkg "github.com/MaksKazantsev/SSO/auth/pkg/grpc"
 	"google.golang.org/grpc"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type server struct {
@@ -30,7 +29,7 @@ func (s *server) Register(ctx context.Context, req *pkg.RegisterReq) (*pkg.Regis
 	if err := s.validator.ValidateRegReq(req); err != nil {
 		return nil, err
 	}
-	res, err := s.service.Register(log.WithLogger(ctx, s.log), s.converter.RegReqToService(req))
+	res, err := s.service.Auth.Register(log.WithLogger(ctx, s.log), s.converter.RegReqToService(req))
 	if err != nil {
 		return nil, utils.HandleError(err)
 	}
@@ -41,20 +40,9 @@ func (s *server) Login(ctx context.Context, req *pkg.LoginReq) (*pkg.LoginRes, e
 	if err := s.validator.ValidateLogReq(req); err != nil {
 		return nil, err
 	}
-	rToken, aToken, err := s.service.Login(log.WithLogger(ctx, s.log), s.converter.LoginReqToService(req))
+	rToken, aToken, err := s.service.Auth.Login(log.WithLogger(ctx, s.log), s.converter.LoginReqToService(req))
 	if err != nil {
 		return nil, utils.HandleError(err)
 	}
 	return s.converter.LoginResToPb(aToken, rToken), nil
-}
-
-func (s *server) Reset(ctx context.Context, req *pkg.ResetReq) (*emptypb.Empty, error) {
-	if err := s.validator.ValidateResReq(req); err != nil {
-		return nil, err
-	}
-
-	if err := s.service.Reset(log.WithLogger(ctx, s.log), s.converter.ResetReqToService(req)); err != nil {
-		return nil, utils.HandleError(err)
-	}
-	return nil, nil
 }

@@ -7,24 +7,19 @@ import (
 
 type Repository interface {
 	Auth
-	Internal
 	Verification
 }
 
 type Auth interface {
 	Login(ctx context.Context, req models.LogReq) error
 	Register(ctx context.Context, req models.RegReq) error
-}
-type Internal interface {
+	EmailAddCode(ctx context.Context, code string, email string) error
 	GetHashAndID(ctx context.Context, email string) (HashAndID, error)
-	EmailAddCode(ctx context.Context, code, email string) error
-	EmailVerifyCode(ctx context.Context, code, email, t string) error
 }
-
 type Verification interface {
-	EmailAddCode(ctx context.Context, code, email string) error
-	EmailVerifyCode(ctx context.Context, code, email, t string) error
+	EmailVerifyCode(ctx context.Context, code, email, t string) (string, error)
 	PasswordRecovery(ctx context.Context, cr models.Credentials) error
+	UpdateRToken(ctx context.Context, id, rToken string) error
 }
 
 type HashAndID struct {

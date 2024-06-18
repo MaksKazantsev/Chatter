@@ -67,3 +67,21 @@ func (p *Postgres) Login(ctx context.Context, req models.LogReq) error {
 	log.GetLogger(ctx).Debug("db layer success")
 	return nil
 }
+
+func (p *Postgres) EmailAddCode(ctx context.Context, code, email string) error {
+	q := `INSERT INTO codes (code,email) VALUES ($1,$2)`
+	_, err := p.Exec(q, code, email)
+	if err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	return nil
+}
+
+func (p *Postgres) UpdateRToken(ctx context.Context, id, rToken string) error {
+	q := `UPDATE users SET refresh = $1 WHERE uuid = $2`
+	_, err := p.Exec(q, rToken, id)
+	if err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	return nil
+}
