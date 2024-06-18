@@ -20,19 +20,18 @@ type userAuthCl struct {
 
 func (u userAuthCl) Register(ctx context.Context, req models.SignupReq) (string, string, error) {
 	res, err := u.cl.Register(ctx, u.c.RegReqToPb(req))
-
 	if err != nil {
-		return "", utils.GRPCErrorToError(err)
+		return "", "", utils.GRPCErrorToError(err)
 	}
-	return res.Token, nil
+	return res.AccessToken, res.RefreshToken, nil
 }
 
 func (u userAuthCl) Login(ctx context.Context, req models.LoginReq) (string, string, error) {
 	res, err := u.cl.Login(ctx, u.c.LogReqToPb(req))
 	if err != nil {
-		return "", utils.GRPCErrorToError(err)
+		return "", "", utils.GRPCErrorToError(err)
 	}
-	return res.Token, nil
+	return res.AccessToken, res.RefreshToken, nil
 }
 
 func (u userAuthCl) Reset(ctx context.Context, req models.ResetReq) error {

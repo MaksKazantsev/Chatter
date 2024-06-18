@@ -9,6 +9,7 @@ import (
 	"github.com/MaksKazantsev/SSO/auth/internal/models"
 	"github.com/MaksKazantsev/SSO/auth/internal/utils"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 type Postgres struct {
@@ -24,13 +25,24 @@ func NewRepository(db *sqlx.DB) *Postgres {
 }
 
 func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
-	q := `INSERT INTO users (uuid,email,username,password,refresh) VALUES($1,$2,$3,$4,$5)`
-
-	_, err := p.Exec(q, req.UUID, req.Email, req.Username, req.Password, req.Refresh)
+	q := `INSERT INTO users (uuid,email,username,password,refresh,isverified,join) VALUES($1,$2,$3,$4,$5,$6,$7)`
+	tx, err := p.BeginTx(ctx, &sql.TxOptions{})
 	if err != nil {
-		return utils.NewError("user with this email already exists", utils.ErrBadRequest)
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	_, err = tx.Exec(q, req.UUID, req.Email, req.Username, req.Password, req.Refresh, false, time.Now())
+	if err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
+	q = `INSERT INTO user_profiles (uuid,username,email,birthday,bio,lastonline,firstname,secondname) VALUES($1,$2,$3,$4,$5,$6,$7,$8)`
+	_, err = tx.Exec(q, req.UUID, req.Username, req.Email, " ", " ", time.Now(), " ", " ")
+	if err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	if err = tx.Commit(); err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
 	log.GetLogger(ctx).Debug("db layer success")
 	return nil
 }
@@ -46,18 +58,12 @@ func (p *Postgres) Login(ctx context.Context, req models.LogReq) error {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
-	log.GetLogger(ctx).Debug("db layer success")
-	return nil
-}
-
-func (p *Postgres) Reset(ctx context.Context, password, uuid string) error {
-	q := `UPDATE users SET password = $1 WHERE uuid = $2`
-
-	_, err := p.Exec(q, password, uuid)
+	q = `UPDATE user_profiles SET lastonline = $1 WHERE email = $2`
+	_, err = p.Exec(q, time.Now(), req.Email)
 	if err != nil {
-		return utils.NewError("user with this id not found", utils.ErrNotFound)
+		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
-	log.GetLogger(ctx).Debug("repo layer success ✔")
 
+	log.GetLogger(ctx).Debug("db layer success")
 	return nil
 }

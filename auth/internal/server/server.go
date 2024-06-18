@@ -32,7 +32,6 @@ func (s *server) Register(ctx context.Context, req *pkg.RegisterReq) (*pkg.Regis
 	}
 	res, err := s.service.Register(log.WithLogger(ctx, s.log), s.converter.RegReqToService(req))
 	if err != nil {
-		s.log.Error("error", err)
 		return nil, utils.HandleError(err)
 	}
 	return s.converter.RegResToPb(res), nil

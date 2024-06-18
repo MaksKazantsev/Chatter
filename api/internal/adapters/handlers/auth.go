@@ -22,12 +22,12 @@ func (a *Auth) Register(c *fiber.Ctx) error {
 		c.Status(http.StatusBadRequest)
 		return nil
 	}
-	token, err := a.cl.Register(c.Context(), body)
+	aToken, rToken, err := a.cl.Register(c.Context(), body)
 	if err != nil {
 		code, msg := utils.HandleError(err)
 		_ = c.Status(code).SendString(msg)
 	}
-	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": token})
+	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
 	return nil
 }
 
@@ -37,13 +37,13 @@ func (a *Auth) Login(c *fiber.Ctx) error {
 		c.Status(http.StatusBadRequest)
 		return nil
 	}
-	token, err := a.cl.Login(c.Context(), body)
+	aToken, rToken, err := a.cl.Login(c.Context(), body)
 	if err != nil {
 		code, msg := utils.HandleError(err)
 		_ = c.Status(code).SendString(msg)
 		return nil
 	}
-	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": token})
+	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
 	return nil
 }
 

@@ -3,7 +3,7 @@ module github.com/MaksKazantsev/SSO/api
 go 1.22.1
 
 require (
-	github.com/MaksKazantsev/SSO/auth v0.0.0-20240607214121-3e6991e2a1e7
+	github.com/MaksKazantsev/SSO/auth v0.0.0-20240618095312-e6fb6df2583c
 	github.com/goccy/go-yaml v1.11.3
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/joho/godotenv v1.5.1
