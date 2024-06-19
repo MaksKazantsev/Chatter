@@ -3,7 +3,6 @@ package service
 import (
 	"context"
 	"fmt"
-	"github.com/MaksKazantsev/SSO/auth/internal/db"
 	"github.com/MaksKazantsev/SSO/auth/internal/log"
 	"github.com/MaksKazantsev/SSO/auth/internal/models"
 	"github.com/MaksKazantsev/SSO/auth/internal/utils"
@@ -12,27 +11,38 @@ import (
 	"strconv"
 )
 
-type Auth interface {
-	Register(ctx context.Context, req models.RegReq) (models.RegRes, error)
-	Login(ctx context.Context, req models.LogReq) (string, string, error)
-	EmailSendCode(ctx context.Context, email string) error
-	PasswordRecovery(ctx context.Context, cr models.Credentials) error
-	EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error)
-}
+func (a *service) UpdateTokens(ctx context.Context, refresh string) (string, string, error) {
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
 
-type auth struct {
-	repo db.Repository
-	smtp utils.Smtp
-}
+	// parse token
 
-func NewAuth(repo db.Repository) Auth {
-	return &auth{
-		repo: repo,
-		smtp: utils.NewSmtp(),
+	cl, err := utils.ParseToken(refresh)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to parse token: %w", err)
 	}
+	userID, ok := cl["id"].(string)
+	if !ok {
+		return "", "", utils.NewError("failed to cast token email field to string", utils.ErrInternal)
+	}
+
+	// generating tokens
+	rToken, err := utils.NewToken(userID, utils.REFRESH)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate token: %w", err)
+	}
+	aToken, err := utils.NewToken(userID, utils.ACCESS)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to generate token: %w", err)
+	}
+
+	if err = a.repo.UpdateRToken(ctx, userID, rToken); err != nil {
+		return "", "", fmt.Errorf("repo error: %w", err)
+	}
+	return aToken, rToken, nil
 }
 
-func (a *auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
+func (a *service) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -83,7 +93,7 @@ func (a *auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, 
 	}, nil
 }
 
-func (a *auth) Login(ctx context.Context, req models.LogReq) (string, string, error) {
+func (a *service) Login(ctx context.Context, req models.LogReq) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -118,7 +128,7 @@ func (a *auth) Login(ctx context.Context, req models.LogReq) (string, string, er
 	return rToken, aToken, nil
 }
 
-func (a *auth) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
+func (a *service) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -137,7 +147,7 @@ func (a *auth) PasswordRecovery(ctx context.Context, cr models.Credentials) erro
 	return nil
 }
 
-func (a *auth) EmailSendCode(ctx context.Context, email string) error {
+func (a *service) EmailSendCode(ctx context.Context, email string) error {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -156,7 +166,7 @@ func (a *auth) EmailSendCode(ctx context.Context, email string) error {
 	return nil
 }
 
-func (a *auth) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
+func (a *service) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 

@@ -13,11 +13,20 @@ type UserAuth interface {
 	SendCode(ctx context.Context, email string) error
 	VerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, string, error)
 	PasswordRecovery(ctx context.Context, req models.RecoveryReq) error
+	UpdateTokens(ctx context.Context, refresh string) (string, string, error)
 }
 
 type userAuthCl struct {
 	cl pkg.UserClient
 	c  utils.Converter
+}
+
+func (u userAuthCl) UpdateTokens(ctx context.Context, refresh string) (string, string, error) {
+	res, err := u.cl.UpdateToken(ctx, u.c.UpdateTokens(refresh))
+	if err != nil {
+		return "", "", utils.GRPCErrorToError(err)
+	}
+	return res.AToken, res.RToken, nil
 }
 
 func (u userAuthCl) PasswordRecovery(ctx context.Context, req models.RecoveryReq) error {

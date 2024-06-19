@@ -23,4 +23,5 @@ func InitRoutes(app *fiber.App, ctrl *Controller) {
 	auth.Put("/recovery", ctrl.Auth.PasswordRecovery)
 	auth.Get("/email/verify", ctrl.Auth.VerifyCode)
 	auth.Get("/email/send", ctrl.Auth.SendCode)
+	auth.Get("/refresh", ctrl.Auth.UpdateTokens)
 }

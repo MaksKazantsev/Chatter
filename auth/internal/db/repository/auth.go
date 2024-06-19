@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/MaksKazantsev/SSO/auth/internal/log"
 	"github.com/MaksKazantsev/SSO/auth/internal/models"
 	"github.com/MaksKazantsev/SSO/auth/internal/utils"
@@ -35,6 +36,7 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 }
 
 func (p *Postgres) Login(ctx context.Context, req models.LogReq) error {
+	fmt.Println("here")
 	q := `UPDATE users SET refresh = $1 WHERE email = $2`
 
 	_, err := p.Exec(q, req.Refresh, req.Email)
@@ -61,5 +63,6 @@ func (p *Postgres) EmailAddCode(ctx context.Context, code, email string) error {
 	if err != nil {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
+	log.GetLogger(ctx).Debug("db layer success")
 	return nil
 }

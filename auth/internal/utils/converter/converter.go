@@ -14,6 +14,7 @@ type ToPb interface {
 	RegResToPb(req models.RegRes) *pkg.RegisterRes
 	LoginResToPb(access, refresh string) *pkg.LoginRes
 	VerifyCodeResToPb(access, refresh string) *pkg.VerifyRes
+	UpdateTokensResToPb(access, refresh string) *pkg.UpdateTokenRes
 }
 
 type ToService interface {
@@ -22,6 +23,7 @@ type ToService interface {
 	SendCodeReqToService(req *pkg.SendReq) string
 	VerifyCodeReqToService(req *pkg.VerifyReq) (string, string, string)
 	RecoveryReqToService(req *pkg.RecoveryReq) models.Credentials
+	UpdateTokensReqToService(req *pkg.UpdateTokenReq) string
 }
 
 func NewConverter() Converter {
@@ -29,6 +31,14 @@ func NewConverter() Converter {
 }
 
 type converter struct {
+}
+
+func (c converter) UpdateTokensResToPb(access, refresh string) *pkg.UpdateTokenRes {
+	return &pkg.UpdateTokenRes{AToken: access, RToken: refresh}
+}
+
+func (c converter) UpdateTokensReqToService(req *pkg.UpdateTokenReq) string {
+	return req.RToken
 }
 
 func (c converter) RecoveryReqToService(req *pkg.RecoveryReq) models.Credentials {

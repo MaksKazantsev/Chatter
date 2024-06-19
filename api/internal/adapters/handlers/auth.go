@@ -97,3 +97,19 @@ func (a *Auth) PasswordRecovery(c *fiber.Ctx) error {
 	c.Status(http.StatusOK)
 	return nil
 }
+
+func (a *Auth) UpdateTokens(c *fiber.Ctx) error {
+	refresh := parseAuthHeader(c)
+	if refresh == "" {
+		_ = c.Status(http.StatusBadRequest).SendString("no refresh token found")
+		return nil
+	}
+	aToken, rToken, err := a.cl.UpdateTokens(c.Context(), refresh)
+	if err != nil {
+		code, msg := utils.HandleError(err)
+		_ = c.Status(code).SendString(msg)
+		return nil
+	}
+	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
+	return nil
+}

@@ -17,12 +17,19 @@ func NewConverter() Converter {
 type converter struct {
 }
 
+func (c converter) UpdateTokens(req string) *pkg.UpdateTokenReq {
+	return &pkg.UpdateTokenReq{
+		RToken: req,
+	}
+}
+
 type ToPb interface {
 	RegReqToPb(req models.SignupReq) *pkg.RegisterReq
 	LogReqToPb(req models.LoginReq) *pkg.LoginReq
 	SendCodeReqToPb(req string) *pkg.SendReq
 	VerifyCodeReqToPb(req models.VerifyCodeReq) *pkg.VerifyReq
 	RecoveryReqToPb(req models.RecoveryReq) *pkg.RecoveryReq
+	UpdateTokens(req string) *pkg.UpdateTokenReq
 }
 
 type ToService interface {
