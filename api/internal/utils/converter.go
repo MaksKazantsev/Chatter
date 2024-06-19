@@ -20,15 +20,35 @@ type converter struct {
 type ToPb interface {
 	RegReqToPb(req models.SignupReq) *pkg.RegisterReq
 	LogReqToPb(req models.LoginReq) *pkg.LoginReq
-	ResReqToPb(req models.ResetReq) *pkg.ResetReq
+	SendCodeReqToPb(req string) *pkg.SendReq
+	VerifyCodeReqToPb(req models.VerifyCodeReq) *pkg.VerifyReq
+	RecoveryReqToPb(req models.RecoveryReq) *pkg.RecoveryReq
 }
 
 type ToService interface {
 }
 
-func (c converter) ResReqToPb(req models.ResetReq) *pkg.ResetReq {
-	return &pkg.ResetReq{OldPassword: req.OldPassword, NewPassword: req.NewPassword}
+func (c converter) RecoveryReqToPb(req models.RecoveryReq) *pkg.RecoveryReq {
+	return &pkg.RecoveryReq{
+		Email:    req.Email,
+		Password: req.Password,
+	}
 }
+
+func (c converter) VerifyCodeReqToPb(req models.VerifyCodeReq) *pkg.VerifyReq {
+	return &pkg.VerifyReq{
+		Code:  req.Code,
+		Email: req.Email,
+		Type:  req.Type,
+	}
+}
+
+func (c converter) SendCodeReqToPb(email string) *pkg.SendReq {
+	return &pkg.SendReq{
+		Email: email,
+	}
+}
+
 func (c converter) LogReqToPb(req models.LoginReq) *pkg.LoginReq {
 	return &pkg.LoginReq{Email: req.Email, Password: req.Password}
 }

@@ -16,13 +16,14 @@ const (
 
 func NewToken(uuid, t string) (string, error) {
 	_ = godotenv.Load()
-	token := jwt.New(jwt.SigningMethodHS512)
+	token := jwt.New(jwt.SigningMethodRS512)
 	claims := token.Claims.(jwt.MapClaims)
 	switch t {
 	case REFRESH:
 		claims["id"] = uuid
 		claims["exp"] = time.Now().Add(time.Hour * 24 * 30).Unix()
 	case ACCESS:
+		claims["id"] = uuid
 		claims["exp"] = time.Now().Add(time.Minute * 15).Unix()
 	}
 

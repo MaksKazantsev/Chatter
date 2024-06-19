@@ -10,6 +10,8 @@ service User {
   rpc SendCode(SendReq) returns(google.protobuf.Empty);
   rpc VerifyCode(VerifyReq) returns(VerifyRes);
   rpc Recovery(RecoveryReq) returns (google.protobuf.Empty);
+
+  rpc UpdateToken(UpdateTokenReq) returns (UpdateTokenRes);
 }
 
 message RegisterReq {
@@ -52,4 +54,13 @@ message VerifyRes {
 message RecoveryReq {
   string Email = 1;
   string Password = 2;
+}
+
+message UpdateTokenReq{
+  string RToken = 1;
+}
+
+message UpdateTokenRes{
+  string RToken = 1;
+  string AToken = 2;
 }

@@ -12,19 +12,27 @@ import (
 	"strconv"
 )
 
-type Auth struct {
-	repo db.Auth
+type Auth interface {
+	Register(ctx context.Context, req models.RegReq) (models.RegRes, error)
+	Login(ctx context.Context, req models.LogReq) (string, string, error)
+	EmailSendCode(ctx context.Context, email string) error
+	PasswordRecovery(ctx context.Context, cr models.Credentials) error
+	EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error)
+}
+
+type auth struct {
+	repo db.Repository
 	smtp utils.Smtp
 }
 
-func NewAuth(repo db.Auth) *Auth {
-	return &Auth{
+func NewAuth(repo db.Repository) Auth {
+	return &auth{
 		repo: repo,
 		smtp: utils.NewSmtp(),
 	}
 }
 
-func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
+func (a *auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -49,20 +57,25 @@ func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, 
 	}
 	req.Refresh = rToken
 
+	// calling repo method
 	if err = a.repo.Register(ctx, req); err != nil {
 		return models.RegRes{}, fmt.Errorf("repo error: %w", err)
 	}
 
 	code := strconv.Itoa(rand.Intn(9001) + 1000)
 
+	// sending code
 	go func() {
 		if err = a.smtp.SendCode(code, req.Email); err != nil {
 			fmt.Printf("smtp error: %v\n", err)
 		}
 	}()
+
+	// calling repo method
 	if err = a.repo.EmailAddCode(ctx, code, req.Email); err != nil {
 		return models.RegRes{}, fmt.Errorf("repo error: %w", err)
 	}
+
 	return models.RegRes{
 		UUID:         req.UUID,
 		RefreshToken: rToken,
@@ -70,7 +83,7 @@ func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, 
 	}, nil
 }
 
-func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, error) {
+func (a *auth) Login(ctx context.Context, req models.LogReq) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -105,7 +118,26 @@ func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, er
 	return rToken, aToken, nil
 }
 
-func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
+func (a *auth) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
+
+	// hashing password
+	hashed, err := utils.HashPassword(cr.Password)
+	if err != nil {
+		return fmt.Errorf("repo error: %w", err)
+	}
+	cr.Password = hashed
+
+	// calling repo method
+	err = a.repo.PasswordRecovery(ctx, cr)
+	if err != nil {
+		return fmt.Errorf("repo error: %w", err)
+	}
+	return nil
+}
+
+func (a *auth) EmailSendCode(ctx context.Context, email string) error {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -122,4 +154,31 @@ func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
 		return fmt.Errorf("repo errpr: %w", err)
 	}
 	return nil
+}
+
+func (a *auth) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
+
+	// calling repo method
+	id, err := a.repo.EmailVerifyCode(ctx, code, email, t)
+	if err != nil {
+		return "", "", fmt.Errorf("repo error: %w", err)
+	}
+
+	// generating tokes
+	aToken, err := utils.NewToken(id, utils.ACCESS)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to create token: %w", err)
+	}
+	rToken, err := utils.NewToken(id, utils.REFRESH)
+	if err != nil {
+		return "", "", fmt.Errorf("failed to create token: %w", err)
+	}
+
+	// update refresh token
+	if err = a.repo.UpdateRToken(ctx, id, rToken); err != nil {
+		return "", "", fmt.Errorf("repo error: %w", err)
+	}
+	return aToken, rToken, nil
 }

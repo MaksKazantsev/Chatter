@@ -11,8 +11,17 @@ type LoginReq struct {
 	Password string `json:"password"`
 }
 
-type ResetReq struct {
-	OldPassword string `json:"oldPassword"`
-	NewPassword string `json:"newPassword"`
-	Token       string `json:"token"`
+type VerifyCodeReq struct {
+	Email string `json:"email"`
+	Code  string `json:"-"`
+	Type  string `json:"-"`
+}
+
+type RecoveryReq struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type SendReq struct {
+	Email string `json:"email"`
 }

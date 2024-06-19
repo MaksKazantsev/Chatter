@@ -10,7 +10,9 @@ import (
 type Validator interface {
 	ValidateRegReq(req *pkg.RegisterReq) error
 	ValidateLogReq(req *pkg.LoginReq) error
-	ValidateResReq(req *pkg.ResetReq) error
+	ValidateSendCodeReq(req *pkg.SendReq) error
+	ValidateVerifyCodeReq(req *pkg.VerifyReq) error
+	ValidateRecoveryReq(req *pkg.RecoveryReq) error
 }
 
 func NewValidator() Validator {
@@ -23,9 +25,32 @@ type validator struct {
 	regExpEmail *regexp.Regexp
 }
 
-func (v validator) ValidateResReq(req *pkg.ResetReq) error {
-	if len(req.OldPassword) < 5 || len(req.OldPassword) > 25 || len(req.NewPassword) < 5 || len(req.NewPassword) > 25 {
+func (v validator) ValidateRecoveryReq(req *pkg.RecoveryReq) error {
+	ok := v.regExpEmail.MatchString(req.Email)
+	if !ok {
+		return status.Error(codes.InvalidArgument, "Invalid email")
+	}
+	if len(req.Password) < 5 || len(req.Password) > 25 {
 		return status.Error(codes.InvalidArgument, "Password can't be shorter than 5 or longer than 25 symbols")
+	}
+	return nil
+}
+
+func (v validator) ValidateVerifyCodeReq(req *pkg.VerifyReq) error {
+	ok := v.regExpEmail.MatchString(req.Email)
+	if !ok {
+		return status.Error(codes.InvalidArgument, "Invalid email")
+	}
+	if len(req.Code) != 4 {
+		return status.Error(codes.InvalidArgument, "Code must be 4-symbol")
+	}
+	return nil
+}
+
+func (v validator) ValidateSendCodeReq(req *pkg.SendReq) error {
+	ok := v.regExpEmail.MatchString(req.Email)
+	if !ok {
+		return status.Error(codes.InvalidArgument, "Invalid email")
 	}
 	return nil
 }

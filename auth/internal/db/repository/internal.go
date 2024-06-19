@@ -21,3 +21,12 @@ func (p *Postgres) GetHashAndID(ctx context.Context, email string) (db.HashAndID
 	}
 	return res, nil
 }
+
+func (p *Postgres) UpdateRToken(ctx context.Context, id, rToken string) error {
+	q := `UPDATE users SET refresh = $1 WHERE uuid = $2`
+	_, err := p.Exec(q, rToken, id)
+	if err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	return nil
+}

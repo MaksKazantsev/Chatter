@@ -20,5 +20,7 @@ func InitRoutes(app *fiber.App, ctrl *Controller) {
 	auth := app.Group("/auth")
 	auth.Post("/register", ctrl.Auth.Register)
 	auth.Put("/login", ctrl.Auth.Login)
-	auth.Put("/reset", ctrl.Auth.Reset)
+	auth.Put("/recovery", ctrl.Auth.PasswordRecovery)
+	auth.Get("/email/verify", ctrl.Auth.VerifyCode)
+	auth.Get("/email/send", ctrl.Auth.SendCode)
 }

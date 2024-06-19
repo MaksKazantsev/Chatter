@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/MaksKazantsev/SSO/auth/internal/log"
 	"github.com/MaksKazantsev/SSO/auth/internal/models"
 	"github.com/MaksKazantsev/SSO/auth/internal/utils"
 )
@@ -45,24 +46,26 @@ func (p *Postgres) EmailVerifyCode(ctx context.Context, code, email, t string) (
 
 	q = `SELECT uuid FROM users WHERE email = $1`
 	var uuid string
-	err = p.QueryRow(q, true, email).Scan(&uuid)
+	err = p.QueryRow(q, email).Scan(&uuid)
 	if err != nil {
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
+	log.GetLogger(ctx).Debug("db layer success")
 	return uuid, nil
 }
 
 func (p *Postgres) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
 	var verified bool
-	tx, err := p.BeginTx(ctx, &sql.TxOptions{})
+	tx, err := p.BeginTx(ctx, &sql.TxOptions{Isolation: sql.LevelSerializable})
+	defer tx.Rollback()
 	if err != nil {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 	q := `SELECT isverified FROM codes WHERE email = $1`
 	if err = tx.QueryRow(q, cr.Email).Scan(&verified); err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
-			return utils.NewError("user not found", utils.ErrNotFound)
+			return utils.NewError("user not found or code not sent", utils.ErrNotFound)
 		}
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
@@ -73,11 +76,23 @@ func (p *Postgres) PasswordRecovery(ctx context.Context, cr models.Credentials) 
 	q = `UPDATE users SET password = $1 WHERE email = $2`
 	res, err := tx.Exec(q, cr.Password, cr.Email)
 	if err != nil {
-
+		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 	amount, _ := res.RowsAffected()
 	if amount == 0 {
 		return utils.NewError("user not found", utils.ErrNotFound)
 	}
+
+	q = `DELETE FROM codes WHERE email = $1 AND isverified = $2`
+	res, err = tx.Exec(q, cr.Email, true)
+	if err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+
+	if err = tx.Commit(); err != nil {
+		return utils.NewError(err.Error(), utils.ErrInternal)
+	}
+
+	log.GetLogger(ctx).Debug("db layer success")
 	return nil
 }

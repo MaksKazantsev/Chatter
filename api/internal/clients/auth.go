@@ -10,12 +10,38 @@ import (
 type UserAuth interface {
 	Register(ctx context.Context, req models.SignupReq) (string, string, error)
 	Login(ctx context.Context, req models.LoginReq) (string, string, error)
-	Reset(ctx context.Context, req models.ResetReq) error
+	SendCode(ctx context.Context, email string) error
+	VerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, string, error)
+	PasswordRecovery(ctx context.Context, req models.RecoveryReq) error
 }
 
 type userAuthCl struct {
 	cl pkg.UserClient
 	c  utils.Converter
+}
+
+func (u userAuthCl) PasswordRecovery(ctx context.Context, req models.RecoveryReq) error {
+	_, err := u.cl.Recovery(ctx, u.c.RecoveryReqToPb(req))
+	if err != nil {
+		return utils.GRPCErrorToError(err)
+	}
+	return nil
+}
+
+func (u userAuthCl) VerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, string, error) {
+	res, err := u.cl.VerifyCode(ctx, u.c.VerifyCodeReqToPb(req))
+	if err != nil {
+		return "", "", utils.GRPCErrorToError(err)
+	}
+	return res.AccessToken, res.RefreshToken, nil
+}
+
+func (u userAuthCl) SendCode(ctx context.Context, email string) error {
+	_, err := u.cl.SendCode(ctx, u.c.SendCodeReqToPb(email))
+	if err != nil {
+		return utils.GRPCErrorToError(err)
+	}
+	return nil
 }
 
 func (u userAuthCl) Register(ctx context.Context, req models.SignupReq) (string, string, error) {
@@ -32,14 +58,6 @@ func (u userAuthCl) Login(ctx context.Context, req models.LoginReq) (string, str
 		return "", "", utils.GRPCErrorToError(err)
 	}
 	return res.AccessToken, res.RefreshToken, nil
-}
-
-func (u userAuthCl) Reset(ctx context.Context, req models.ResetReq) error {
-	_, err := u.cl.Reset(ctx, u.c.ResReqToPb(req))
-	if err != nil {
-		return utils.GRPCErrorToError(err)
-	}
-	return nil
 }
 
 func NewUserAuth(cl pkg.UserClient) UserAuth {

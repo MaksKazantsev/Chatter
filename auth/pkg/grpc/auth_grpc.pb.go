@@ -28,6 +28,7 @@ type UserClient interface {
 	SendCode(ctx context.Context, in *SendReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	VerifyCode(ctx context.Context, in *VerifyReq, opts ...grpc.CallOption) (*VerifyRes, error)
 	Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateToken(ctx context.Context, in *UpdateTokenReq, opts ...grpc.CallOption) (*UpdateTokenRes, error)
 }
 
 type userClient struct {
@@ -83,6 +84,15 @@ func (c *userClient) Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc
 	return out, nil
 }
 
+func (c *userClient) UpdateToken(ctx context.Context, in *UpdateTokenReq, opts ...grpc.CallOption) (*UpdateTokenRes, error) {
+	out := new(UpdateTokenRes)
+	err := c.cc.Invoke(ctx, "/User/UpdateToken", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -92,6 +102,7 @@ type UserServer interface {
 	SendCode(context.Context, *SendReq) (*emptypb.Empty, error)
 	VerifyCode(context.Context, *VerifyReq) (*VerifyRes, error)
 	Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error)
+	UpdateToken(context.Context, *UpdateTokenReq) (*UpdateTokenRes, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -113,6 +124,9 @@ func (UnimplementedUserServer) VerifyCode(context.Context, *VerifyReq) (*VerifyR
 }
 func (UnimplementedUserServer) Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Recovery not implemented")
+}
+func (UnimplementedUserServer) UpdateToken(context.Context, *UpdateTokenReq) (*UpdateTokenRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateToken not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -217,6 +231,24 @@ func _User_Recovery_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UpdateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateTokenReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/UpdateToken",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateToken(ctx, req.(*UpdateTokenReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -243,6 +275,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Recovery",
 			Handler:    _User_Recovery_Handler,
+		},
+		{
+			MethodName: "UpdateToken",
+			Handler:    _User_UpdateToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
