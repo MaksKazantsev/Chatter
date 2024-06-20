@@ -1,5 +1,7 @@
-github.com/MaksKazantsev/SSO/auth v0.0.0-20240619115651-412731b0cfd8 h1:HHVhPHzegNpcSZX+bRSwF5RGi+AnA94NC0Sv64rVU7o=
-github.com/MaksKazantsev/SSO/auth v0.0.0-20240619115651-412731b0cfd8/go.mod h1:eeFJFZ1/BBw7OaOl19uUGRzTOz+ySv2p3Z9W8Yr1BIc=
+github.com/MaksKazantsev/SSO/api v0.0.0-20240619182737-e4f85306624e h1:z59OeyRPBHhhIiL/yex0bm89Y/s5sT8T11yqQMhpjlM=
+github.com/MaksKazantsev/SSO/api v0.0.0-20240619182737-e4f85306624e/go.mod h1:4ky/l9FuLpJ/6n4DZqW3jSpEeSImsNTdP3pOyxEIMoc=
+github.com/MaksKazantsev/SSO/auth v0.0.0-20240619182737-e4f85306624e h1:ovKiEBOoyWsejUFFE+6cyJkjJkq9r4Yord2gDRHwcFg=
+github.com/MaksKazantsev/SSO/auth v0.0.0-20240619182737-e4f85306624e/go.mod h1:eeFJFZ1/BBw7OaOl19uUGRzTOz+ySv2p3Z9W8Yr1BIc=
 github.com/andybalholm/brotli v1.1.0 h1:eLKJA0d02Lf0mVpIDgYnqXcUn0GqVmEFny3VuID1U3M=
 github.com/andybalholm/brotli v1.1.0/go.mod h1:sms7XGricyQI9K10gOSf56VKKWS4oLer58Q+mhRPtnY=
 github.com/fatih/color v1.17.0 h1:GlRw1BRJxkpqUCBKzKOw098ed57fEsKeNjpTe3cSjK4=

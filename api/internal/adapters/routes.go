@@ -17,7 +17,7 @@ func NewController(clients clients.Clients) *Controller {
 }
 
 func InitRoutes(app *fiber.App, ctrl *Controller) {
-	auth := app.Group("/auth")
+	auth := app.Group("/user")
 	auth.Post("/register", ctrl.Auth.Register)
 	auth.Put("/login", ctrl.Auth.Login)
 	auth.Put("/recovery", ctrl.Auth.PasswordRecovery)

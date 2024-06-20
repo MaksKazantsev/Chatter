@@ -1,0 +1,73 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/MaksKazantsev/Chatter/user/pkg";
+
+service User {
+  rpc Register(RegisterReq) returns(RegisterRes);
+  rpc Login(LoginReq) returns(LoginRes);
+  rpc SendCode(SendReq) returns(google.protobuf.Empty);
+  rpc VerifyCode(VerifyReq) returns(VerifyRes);
+  rpc Recovery(RecoveryReq) returns (google.protobuf.Empty);
+
+  rpc UpdateToken(UpdateTokenReq) returns (UpdateTokenRes);
+  rpc ParseToken(ParseTokenReq) returns (ParseTokenRes);
+}
+
+message RegisterReq {
+  string Username = 1;
+  string Password = 2;
+  string Email = 3;
+}
+
+message RegisterRes {
+  string UUID = 1;
+  string AccessToken = 2;
+  string RefreshToken = 3;
+}
+
+message LoginReq {
+  string Email = 1;
+  string Password = 2;
+}
+
+message LoginRes {
+  string AccessToken = 1;
+  string RefreshToken = 2;
+}
+
+message SendReq {
+  string Email = 1;
+}
+
+message VerifyReq {
+  string Code = 1;
+  string Email = 2;
+  string Type = 3;
+}
+
+message VerifyRes {
+  string AccessToken = 1;
+  string RefreshToken = 2;
+}
+
+message RecoveryReq {
+  string Email = 1;
+  string Password = 2;
+}
+
+message UpdateTokenReq{
+  string RToken = 1;
+}
+
+message UpdateTokenRes{
+  string RToken = 1;
+  string AToken = 2;
+}
+message ParseTokenReq{
+  string Token = 1;
+}
+message ParseTokenRes{
+  string UUID = 1;
+}
