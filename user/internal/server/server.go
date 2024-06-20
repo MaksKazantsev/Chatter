@@ -7,7 +7,7 @@ import (
 	"github.com/MaksKazantsev/Chatter/user/internal/utils"
 	"github.com/MaksKazantsev/Chatter/user/internal/utils/converter"
 	"github.com/MaksKazantsev/Chatter/user/internal/utils/validator"
-	pkg "github.com/MaksKazantsev/SSO/auth/pkg/grpc"
+	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -86,8 +86,4 @@ func (s *server) UpdateToken(ctx context.Context, req *pkg.UpdateTokenReq) (*pkg
 		return nil, utils.HandleError(err)
 	}
 	return s.converter.UpdateTokensResToPb(aToken, rToken), nil
-}
-
-func (s *server) ParseToken(ctx context.Context, req *pkg.ParseTokenReq) (*pkg.ParseTokenRes, error) {
-
 }

@@ -2,7 +2,7 @@ package converter
 
 import (
 	"github.com/MaksKazantsev/Chatter/user/internal/models"
-	pkg "github.com/MaksKazantsev/SSO/auth/pkg/grpc"
+	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 )
 
 type Converter interface {
