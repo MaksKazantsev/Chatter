@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"github.com/MaksKazantsev/Chatter/user/internal/db"
 	"github.com/MaksKazantsev/Chatter/user/internal/log"
 	"github.com/MaksKazantsev/Chatter/user/internal/models"
 	"github.com/MaksKazantsev/Chatter/user/internal/utils"
@@ -11,7 +12,19 @@ import (
 	"strconv"
 )
 
-func (a *service) UpdateTokens(ctx context.Context, refresh string) (string, string, error) {
+type Auth struct {
+	repo db.Auth
+	smtp utils.Smtp
+}
+
+func NewAuth(repo db.Auth) *Auth {
+	return &Auth{
+		repo: repo,
+		smtp: utils.NewSmtp(),
+	}
+}
+
+func (a *Auth) UpdateTokens(ctx context.Context, refresh string) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -42,7 +55,7 @@ func (a *service) UpdateTokens(ctx context.Context, refresh string) (string, str
 	return aToken, rToken, nil
 }
 
-func (a *service) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
+func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 	fmt.Println(req)
@@ -96,7 +109,7 @@ func (a *service) Register(ctx context.Context, req models.RegReq) (models.RegRe
 	}, nil
 }
 
-func (a *service) Login(ctx context.Context, req models.LogReq) (string, string, error) {
+func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -131,7 +144,7 @@ func (a *service) Login(ctx context.Context, req models.LogReq) (string, string,
 	return rToken, aToken, nil
 }
 
-func (a *service) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
+func (a *Auth) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -150,7 +163,7 @@ func (a *service) PasswordRecovery(ctx context.Context, cr models.Credentials) e
 	return nil
 }
 
-func (a *service) EmailSendCode(ctx context.Context, email string) error {
+func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 
@@ -169,7 +182,7 @@ func (a *service) EmailSendCode(ctx context.Context, email string) error {
 	return nil
 }
 
-func (a *service) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
+func (a *Auth) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("uc layer success ✔")
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v5.26.1
-// source: auth.proto
+// source: user.proto
 
 package pkg
 
@@ -30,6 +30,8 @@ type UserClient interface {
 	Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateToken(ctx context.Context, in *UpdateTokenReq, opts ...grpc.CallOption) (*UpdateTokenRes, error)
 	ParseToken(ctx context.Context, in *ParseTokenReq, opts ...grpc.CallOption) (*ParseTokenRes, error)
+	SuggestFriendShip(ctx context.Context, in *SuggestFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RefuseFriendShip(ctx context.Context, in *RefuseFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -103,6 +105,24 @@ func (c *userClient) ParseToken(ctx context.Context, in *ParseTokenReq, opts ...
 	return out, nil
 }
 
+func (c *userClient) SuggestFriendShip(ctx context.Context, in *SuggestFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/SuggestFriendShip", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) RefuseFriendShip(ctx context.Context, in *RefuseFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/RefuseFriendShip", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -114,6 +134,8 @@ type UserServer interface {
 	Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error)
 	UpdateToken(context.Context, *UpdateTokenReq) (*UpdateTokenRes, error)
 	ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error)
+	SuggestFriendShip(context.Context, *SuggestFriendShipReq) (*emptypb.Empty, error)
+	RefuseFriendShip(context.Context, *RefuseFriendShipReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -141,6 +163,12 @@ func (UnimplementedUserServer) UpdateToken(context.Context, *UpdateTokenReq) (*U
 }
 func (UnimplementedUserServer) ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ParseToken not implemented")
+}
+func (UnimplementedUserServer) SuggestFriendShip(context.Context, *SuggestFriendShipReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SuggestFriendShip not implemented")
+}
+func (UnimplementedUserServer) RefuseFriendShip(context.Context, *RefuseFriendShipReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefuseFriendShip not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -281,6 +309,42 @@ func _User_ParseToken_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_SuggestFriendShip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SuggestFriendShipReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).SuggestFriendShip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/SuggestFriendShip",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).SuggestFriendShip(ctx, req.(*SuggestFriendShipReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_RefuseFriendShip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefuseFriendShipReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).RefuseFriendShip(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/RefuseFriendShip",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).RefuseFriendShip(ctx, req.(*RefuseFriendShipReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -316,7 +380,15 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "ParseToken",
 			Handler:    _User_ParseToken_Handler,
 		},
+		{
+			MethodName: "SuggestFriendShip",
+			Handler:    _User_SuggestFriendShip_Handler,
+		},
+		{
+			MethodName: "RefuseFriendShip",
+			Handler:    _User_RefuseFriendShip_Handler,
+		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "auth.proto",
+	Metadata: "user.proto",
 }

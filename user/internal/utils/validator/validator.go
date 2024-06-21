@@ -1,7 +1,7 @@
 package validator
 
 import (
-	pkg "github.com/MaksKazantsev/SSO/auth/pkg/grpc"
+	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"regexp"

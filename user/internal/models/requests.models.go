@@ -14,8 +14,7 @@ type LogReq struct {
 	Refresh  string `json:"-"`
 }
 
-type ResReq struct {
-	OldPassword string `json:"oldPassword"`
-	Password    string `json:"password"`
-	Token       string `json:"-"`
+type FriendShipReq struct {
+	Token    string
+	Receiver string
 }

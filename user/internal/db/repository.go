@@ -20,6 +20,8 @@ type Auth interface {
 	GetHashAndID(ctx context.Context, email string) (HashAndID, error)
 }
 type Friendship interface {
+	SuggestFriendShip(ctx context.Context, sender, receiver string) error
+	RefuseFriendShip(ctx context.Context, sender, receiver string) error
 }
 
 type HashAndID struct {

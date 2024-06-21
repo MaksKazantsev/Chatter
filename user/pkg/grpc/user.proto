@@ -13,6 +13,9 @@ service User {
 
   rpc UpdateToken(UpdateTokenReq) returns (UpdateTokenRes);
   rpc ParseToken(ParseTokenReq) returns (ParseTokenRes);
+
+  rpc SuggestFriendShip(SuggestFriendShipReq) returns (google.protobuf.Empty);
+  rpc RefuseFriendShip(RefuseFriendShipReq) returns (google.protobuf.Empty);
 }
 
 message RegisterReq {
@@ -70,4 +73,13 @@ message ParseTokenReq{
 }
 message ParseTokenRes{
   string UUID = 1;
+}
+message SuggestFriendShipReq {
+  string Receiver = 1;
+  string Token = 2;
+}
+
+message RefuseFriendShipReq {
+  string Sender = 1;
+  string Token = 2;
 }

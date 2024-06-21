@@ -26,3 +26,8 @@ CREATE TABLE IF NOT EXISTS codes
     email text UNIQUE,
     isverified bool
 );
+CREATE TABLE IF NOT EXISTS friend_reqs
+(
+    sender text,
+    receiver text
+);
