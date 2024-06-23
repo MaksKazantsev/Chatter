@@ -2,10 +2,10 @@ package app
 
 import (
 	"fmt"
-	"github.com/MaksKazantsev/SSO/api/internal/adapters"
-	"github.com/MaksKazantsev/SSO/api/internal/clients"
-	"github.com/MaksKazantsev/SSO/api/internal/config"
-	"github.com/MaksKazantsev/SSO/api/internal/log"
+	"github.com/MaksKazantsev/Chatter/api/internal/adapters"
+	"github.com/MaksKazantsev/Chatter/api/internal/clients"
+	"github.com/MaksKazantsev/Chatter/api/internal/config"
+	"github.com/MaksKazantsev/Chatter/api/internal/log"
 	"github.com/gofiber/fiber/v2"
 	"os"
 	"os/signal"

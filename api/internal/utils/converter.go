@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"github.com/MaksKazantsev/SSO/api/internal/models"
-	pkg "github.com/MaksKazantsev/SSO/auth/pkg/grpc"
+	"github.com/MaksKazantsev/Chatter/api/internal/models"
+	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 )
 
 type Converter interface {
@@ -17,6 +17,32 @@ func NewConverter() Converter {
 type converter struct {
 }
 
+func (c converter) UpdateTokensToPb(req string) *pkg.UpdateTokenReq {
+	return &pkg.UpdateTokenReq{RToken: req}
+}
+
+func (c converter) SuggestFsToPb(req models.FriendShipReq) *pkg.SuggestFriendShipReq {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c converter) RefuseFsToPb(req models.RefuseFriendShipReq) *pkg.RefuseFriendShipReq {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (c converter) ParseTokenToPb(req string) *pkg.ParseTokenReq {
+	return &pkg.ParseTokenReq{Token: req}
+}
+
+func (c converter) SuggestFs(req models.FriendShipReq) *pkg.SuggestFriendShipReq {
+	return &pkg.SuggestFriendShipReq{Token: req.Token, Receiver: req.Receiver}
+}
+
+func (c converter) RefuseFs(req models.RefuseFriendShipReq) *pkg.RefuseFriendShipReq {
+	return &pkg.RefuseFriendShipReq{Token: req.Token, Sender: req.Sender}
+}
+
 func (c converter) UpdateTokens(req string) *pkg.UpdateTokenReq {
 	return &pkg.UpdateTokenReq{
 		RToken: req,
@@ -29,7 +55,10 @@ type ToPb interface {
 	SendCodeReqToPb(req string) *pkg.SendReq
 	VerifyCodeReqToPb(req models.VerifyCodeReq) *pkg.VerifyReq
 	RecoveryReqToPb(req models.RecoveryReq) *pkg.RecoveryReq
-	UpdateTokens(req string) *pkg.UpdateTokenReq
+	UpdateTokensToPb(req string) *pkg.UpdateTokenReq
+	SuggestFsToPb(req models.FriendShipReq) *pkg.SuggestFriendShipReq
+	RefuseFsToPb(req models.RefuseFriendShipReq) *pkg.RefuseFriendShipReq
+	ParseTokenToPb(req string) *pkg.ParseTokenReq
 }
 
 type ToService interface {

@@ -1,14 +1,14 @@
 package clients
 
 import (
-	"github.com/MaksKazantsev/SSO/api/internal/config"
-	pkg "github.com/MaksKazantsev/SSO/auth/pkg/grpc"
+	"github.com/MaksKazantsev/Chatter/api/internal/config"
+	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Clients struct {
-	UserClient UserAuth
+	UserClient User
 }
 
 func Connect(cfg config.Services) Clients {

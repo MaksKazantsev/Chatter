@@ -39,11 +39,11 @@ func ParseToken(token string) (jwt.MapClaims, error) {
 		return []byte(key), nil
 	})
 	if err != nil {
-		return nil, NewError(err.Error(), ErrInternal)
+		return nil, NewError("invalid token", ErrNotAllowed)
 	}
 	claims, ok := t.Claims.(jwt.MapClaims)
 	if claims.Valid() != nil || !ok {
-		return nil, NewError(err.Error(), ErrInternal)
+		return nil, NewError("invalid token", ErrNotAllowed)
 	}
 	return claims, nil
 }

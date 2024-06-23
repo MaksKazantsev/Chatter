@@ -3,6 +3,7 @@ module github.com/MaksKazantsev/Chatter/api
 go 1.22.1
 
 require (
+	github.com/MaksKazantsev/Chatter/user v0.0.0-20240621201903-99a441eeccf9
 	github.com/MaksKazantsev/SSO/api v0.0.0-20240619182737-e4f85306624e
 	github.com/MaksKazantsev/SSO/auth v0.0.0-20240619182737-e4f85306624e
 	github.com/goccy/go-yaml v1.11.3
@@ -25,8 +26,8 @@ require (
 	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.16.0 // indirect
 	golang.org/x/xerrors v0.0.0-20231012003039-104605ab7028 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
-	google.golang.org/protobuf v1.34.1 // indirect
+	google.golang.org/protobuf v1.34.2 // indirect
 )

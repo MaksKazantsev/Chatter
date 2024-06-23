@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -42,7 +43,6 @@ func HandleError(err error) error {
 	case ErrBadRequest:
 		return status.Error(codes.InvalidArgument, e.Message)
 	default:
-		return status.Error(codes.Internal, "Unexpected internal error")
-
+		return status.Error(codes.Internal, fmt.Sprintf("Unexpected: %s", err.Error()))
 	}
 }

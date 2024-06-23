@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"math/rand"
 	"strconv"
+	"time"
 )
 
 type Auth struct {
@@ -56,10 +57,6 @@ func (a *Auth) UpdateTokens(ctx context.Context, refresh string) (string, string
 }
 
 func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, error) {
-	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
-	fmt.Println(req)
-
 	// hashing password
 	hashed, err := utils.HashPassword(req.Password)
 	if err != nil {
@@ -81,12 +78,13 @@ func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, 
 	}
 	req.Refresh = rToken
 
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
+
 	// calling repo method
-	fmt.Println("register")
 	if err = a.repo.Register(ctx, req); err != nil {
 		return models.RegRes{}, fmt.Errorf("repo error: %w", err)
 	}
-	fmt.Println("after")
 
 	code := strconv.Itoa(rand.Intn(9001) + 1000)
 
@@ -145,8 +143,6 @@ func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, er
 }
 
 func (a *Auth) PasswordRecovery(ctx context.Context, cr models.Credentials) error {
-	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
 
 	// hashing password
 	hashed, err := utils.HashPassword(cr.Password)
@@ -154,6 +150,9 @@ func (a *Auth) PasswordRecovery(ctx context.Context, cr models.Credentials) erro
 		return fmt.Errorf("repo error: %w", err)
 	}
 	cr.Password = hashed
+
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
 
 	// calling repo method
 	err = a.repo.PasswordRecovery(ctx, cr)
@@ -164,11 +163,11 @@ func (a *Auth) PasswordRecovery(ctx context.Context, cr models.Credentials) erro
 }
 
 func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
-	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
-
 	// code
 	code := strconv.Itoa(rand.Intn(9009) + 1000)
+
+	// logging
+	log.GetLogger(ctx).Debug("uc layer success ✔")
 
 	// send code
 	if err := a.smtp.SendCode(code, email); err != nil {
@@ -207,4 +206,24 @@ func (a *Auth) EmailVerifyCode(ctx context.Context, code, email, t string) (stri
 		return "", "", fmt.Errorf("repo error: %w", err)
 	}
 	return aToken, rToken, nil
+}
+
+func (a *Auth) ParseToken(ctx context.Context, token string) (string, error) {
+	// Parsing token
+	claims, err := utils.ParseToken(token)
+	if err != nil {
+		return "", fmt.Errorf("failed to parse token: %w", err)
+	}
+	exp, ok := claims["exp"].(float64)
+	if !ok {
+		return "", fmt.Errorf("invalid token error: %w", err)
+	}
+	id, ok := claims["id"].(string)
+	if !ok {
+		return "", fmt.Errorf("invalid token error: %w", err)
+	}
+	if time.Now().After(time.Unix(int64(exp), 0)) {
+		return "", fmt.Errorf("expired token: %w", err)
+	}
+	return id, nil
 }

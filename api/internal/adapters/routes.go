@@ -1,27 +1,31 @@
 package adapters
 
 import (
-	"github.com/MaksKazantsev/SSO/api/internal/adapters/handlers"
-	"github.com/MaksKazantsev/SSO/api/internal/clients"
+	"github.com/MaksKazantsev/Chatter/api/internal/adapters/handlers"
+	"github.com/MaksKazantsev/Chatter/api/internal/clients"
 	"github.com/gofiber/fiber/v2"
 )
 
 type Controller struct {
-	Auth *handlers.Auth
+	User *handlers.User
 }
 
 func NewController(clients clients.Clients) *Controller {
 	return &Controller{
-		Auth: handlers.NewAuth(clients.UserClient),
+		User: handlers.NewUser(clients.UserClient),
 	}
 }
 
 func InitRoutes(app *fiber.App, ctrl *Controller) {
 	auth := app.Group("/user")
-	auth.Post("/register", ctrl.Auth.Register)
-	auth.Put("/login", ctrl.Auth.Login)
-	auth.Put("/recovery", ctrl.Auth.PasswordRecovery)
-	auth.Get("/email/verify", ctrl.Auth.VerifyCode)
-	auth.Get("/email/send", ctrl.Auth.SendCode)
-	auth.Get("/refresh", ctrl.Auth.UpdateTokens)
+	auth.Post("/register", ctrl.User.Register)
+	auth.Put("/login", ctrl.User.Login)
+	auth.Put("/recovery", ctrl.User.PasswordRecovery)
+	auth.Get("/email/verify", ctrl.User.VerifyCode)
+	auth.Get("/email/send", ctrl.User.SendCode)
+	auth.Get("/refresh", ctrl.User.UpdateTokens)
+
+	fs := app.Group("/friends").Use(ctrl.User.ParseToken)
+	fs.Put("/add", ctrl.User.SuggestFriendShip)
+	fs.Delete("/refuse", ctrl.User.RefuseFriendShip)
 }

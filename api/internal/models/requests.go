@@ -25,3 +25,12 @@ type RecoveryReq struct {
 type SendReq struct {
 	Email string `json:"email"`
 }
+
+type FriendShipReq struct {
+	Token    string `json:"-"`
+	Receiver string `json:"receiver"`
+}
+type RefuseFriendShipReq struct {
+	Token  string `json:"-"`
+	Sender string `json:"sender"`
+}

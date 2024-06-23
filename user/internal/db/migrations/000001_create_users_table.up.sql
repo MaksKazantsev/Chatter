@@ -28,6 +28,6 @@ CREATE TABLE IF NOT EXISTS codes
 );
 CREATE TABLE IF NOT EXISTS friend_reqs
 (
-    sender text,
+    sender text UNIQUE,
     receiver text
 );

@@ -5,6 +5,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
+// MustConnect - Database connection
 func MustConnect(addr string) *sqlx.DB {
 	db, err := sqlx.Connect("postgres", addr)
 	if err != nil {

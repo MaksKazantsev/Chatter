@@ -15,6 +15,7 @@ type ToPb interface {
 	LoginResToPb(access, refresh string) *pkg.LoginRes
 	VerifyCodeResToPb(access, refresh string) *pkg.VerifyRes
 	UpdateTokensResToPb(access, refresh string) *pkg.UpdateTokenRes
+	ParseTokenResToPb(uuid string) *pkg.ParseTokenRes
 }
 
 type ToService interface {
@@ -24,6 +25,9 @@ type ToService interface {
 	VerifyCodeReqToService(req *pkg.VerifyReq) (string, string, string)
 	RecoveryReqToService(req *pkg.RecoveryReq) models.Credentials
 	UpdateTokensReqToService(req *pkg.UpdateTokenReq) string
+	SuggestFriendShipToService(req *pkg.SuggestFriendShipReq) models.FriendShipReq
+	RefuseFriendShipToService(req *pkg.RefuseFriendShipReq) models.RefuseFriendShipReq
+	ParseTokenReqToService(req *pkg.ParseTokenReq) string
 }
 
 func NewConverter() Converter {
@@ -31,6 +35,22 @@ func NewConverter() Converter {
 }
 
 type converter struct {
+}
+
+func (c converter) ParseTokenResToPb(uuid string) *pkg.ParseTokenRes {
+	return &pkg.ParseTokenRes{UUID: uuid}
+}
+
+func (c converter) ParseTokenReqToService(req *pkg.ParseTokenReq) string {
+	return req.Token
+}
+
+func (c converter) RefuseFriendShipToService(req *pkg.RefuseFriendShipReq) models.RefuseFriendShipReq {
+	return models.RefuseFriendShipReq{Token: req.Token, Sender: req.Sender}
+}
+
+func (c converter) SuggestFriendShipToService(req *pkg.SuggestFriendShipReq) models.FriendShipReq {
+	return models.FriendShipReq{Token: req.Token, Receiver: req.Receiver}
 }
 
 func (c converter) UpdateTokensResToPb(access, refresh string) *pkg.UpdateTokenRes {

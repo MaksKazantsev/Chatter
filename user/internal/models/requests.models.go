@@ -1,20 +1,29 @@
 package models
 
 type RegReq struct {
-	UUID     string `json:"uuid"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Refresh  string `json:"-"`
+	UUID     string
+	Username string
+	Password string
+	Email    string
+	Refresh  string
 }
 
 type LogReq struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-	Refresh  string `json:"-"`
+	Email    string
+	Password string
+	Refresh  string
 }
 
 type FriendShipReq struct {
 	Token    string
 	Receiver string
+}
+type RefuseFriendShipReq struct {
+	Token  string
+	Sender string
+}
+
+type AcceptFriendShipReq struct {
+	Token  string
+	Sender string
 }
