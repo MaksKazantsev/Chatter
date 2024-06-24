@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/MaksKazantsev/Chatter/user/pkg";
+
+
+service Messages {
+  rpc CreateMessage(CreateMessageReq) returns (google.protobuf.Empty);
+  rpc DeleteMessage(DeleteMessageReq) returns (google.protobuf.Empty);
+}
+
+message CreateMessageReq {
+  string Token = 1;
+  string ReceiverID = 2;
+  string SenderID = 3;
+  string ChatID = 4;
+  string Value = 5;
+}
+
+message DeleteMessageReq {
+  string MessageID = 1;
+}

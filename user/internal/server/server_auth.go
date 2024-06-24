@@ -77,3 +77,10 @@ func (s *server) ParseToken(ctx context.Context, req *pkg.ParseTokenReq) (*pkg.P
 	}
 	return s.converter.ParseTokenResToPb(id), nil
 }
+
+func (s *server) UpdateOnline(ctx context.Context, req *pkg.UpdateOnlineReq) (*emptypb.Empty, error) {
+	if err := s.service.Auth.UpdateOnline(ctx, s.converter.UpdateOnlineReqToService(req)); err != nil {
+		return nil, utils.HandleError(err)
+	}
+	return nil, nil
+}

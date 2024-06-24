@@ -28,6 +28,7 @@ type ToService interface {
 	SuggestFriendShipToService(req *pkg.SuggestFriendShipReq) models.FriendShipReq
 	RefuseFriendShipToService(req *pkg.RefuseFriendShipReq) models.RefuseFriendShipReq
 	ParseTokenReqToService(req *pkg.ParseTokenReq) string
+	UpdateOnlineReqToService(req *pkg.UpdateOnlineReq) string
 }
 
 func NewConverter() Converter {
@@ -35,6 +36,10 @@ func NewConverter() Converter {
 }
 
 type converter struct {
+}
+
+func (c converter) UpdateOnlineReqToService(req *pkg.UpdateOnlineReq) string {
+	return req.UUID
 }
 
 func (c converter) ParseTokenResToPb(uuid string) *pkg.ParseTokenRes {

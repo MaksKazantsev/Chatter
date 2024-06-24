@@ -2,11 +2,12 @@ package app
 
 import (
 	"fmt"
-	"github.com/MaksKazantsev/Chatter/user/internal/config"
-	"github.com/MaksKazantsev/Chatter/user/internal/db/repository"
-	"github.com/MaksKazantsev/Chatter/user/internal/log"
-	"github.com/MaksKazantsev/Chatter/user/internal/server"
-	"github.com/MaksKazantsev/Chatter/user/internal/service"
+	"github.com/MaksKazantsev/Chatter/messages/internal/config"
+	"github.com/MaksKazantsev/Chatter/messages/internal/db/repository"
+	userService "github.com/MaksKazantsev/Chatter/messages/internal/grpc"
+	"github.com/MaksKazantsev/Chatter/messages/internal/log"
+	"github.com/MaksKazantsev/Chatter/messages/internal/server"
+	"github.com/MaksKazantsev/Chatter/messages/internal/service"
 	"google.golang.org/grpc"
 	"log/slog"
 	"net"
@@ -26,11 +27,14 @@ func MustStart(cfg *config.Config) {
 		_ = repo.Close()
 	}()
 
+	// Clients connection
+	cl := userService.Connect(cfg.Services)
+
 	// New service example
 	srvc := service.NewService(repo)
 
 	// New GRPC server
-	srv := server.NewServer(l, srvc)
+	srv := server.NewServer(l, srvc, cl)
 	l.Info("All layers set up")
 
 	shutdown(func() {

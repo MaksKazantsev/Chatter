@@ -32,6 +32,7 @@ type UserClient interface {
 	ParseToken(ctx context.Context, in *ParseTokenReq, opts ...grpc.CallOption) (*ParseTokenRes, error)
 	SuggestFriendShip(ctx context.Context, in *SuggestFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RefuseFriendShip(ctx context.Context, in *RefuseFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateOnline(ctx context.Context, in *UpdateOnlineReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -123,6 +124,15 @@ func (c *userClient) RefuseFriendShip(ctx context.Context, in *RefuseFriendShipR
 	return out, nil
 }
 
+func (c *userClient) UpdateOnline(ctx context.Context, in *UpdateOnlineReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/UpdateOnline", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -136,6 +146,7 @@ type UserServer interface {
 	ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error)
 	SuggestFriendShip(context.Context, *SuggestFriendShipReq) (*emptypb.Empty, error)
 	RefuseFriendShip(context.Context, *RefuseFriendShipReq) (*emptypb.Empty, error)
+	UpdateOnline(context.Context, *UpdateOnlineReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -169,6 +180,9 @@ func (UnimplementedUserServer) SuggestFriendShip(context.Context, *SuggestFriend
 }
 func (UnimplementedUserServer) RefuseFriendShip(context.Context, *RefuseFriendShipReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefuseFriendShip not implemented")
+}
+func (UnimplementedUserServer) UpdateOnline(context.Context, *UpdateOnlineReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateOnline not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -345,6 +359,24 @@ func _User_RefuseFriendShip_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_UpdateOnline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateOnlineReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).UpdateOnline(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/UpdateOnline",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).UpdateOnline(ctx, req.(*UpdateOnlineReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -387,6 +419,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RefuseFriendShip",
 			Handler:    _User_RefuseFriendShip_Handler,
+		},
+		{
+			MethodName: "UpdateOnline",
+			Handler:    _User_UpdateOnline_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

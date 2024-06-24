@@ -18,6 +18,7 @@ type Auth interface {
 	PasswordRecovery(ctx context.Context, cr models.Credentials) error
 	UpdateRToken(ctx context.Context, id, rToken string) error
 	GetHashAndID(ctx context.Context, email string) (HashAndID, error)
+	UpdateOnline(ctx context.Context, uuid string) error
 }
 type Friendship interface {
 	SuggestFriendShip(ctx context.Context, sender, receiver string) error

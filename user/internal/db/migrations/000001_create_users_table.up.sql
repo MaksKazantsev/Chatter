@@ -1,24 +1,24 @@
 CREATE TABLE IF NOT EXISTS users
 (
     uuid       varchar(50) UNIQUE,
-    username text,
+    username text NOT NULL,
     email    text UNIQUE,
-    password text,
-    refresh text,
-    isverified bool,
-    joined time
+    password text NOT NULL,
+    refresh text NOT NULL,
+    isverified bool NOT NULL,
+    joined TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 CREATE TABLE IF NOT EXISTS user_profiles
 (
     uuid varchar(50) UNIQUE,
-    avatar text,
-    username text,
-    firstname text,
-    secondname text,
+    avatar text NOT NULL,
+    username text NOT NULL,
+    firstname text NOT NULL,
+    secondname text NOT NULL,
     email text UNIQUE,
-    birthday text,
-    bio text,
-    lastonline time
+    birthday text NOT NULL,
+    bio text NOT NULL,
+    lastonline TIMESTAMP
 );
 CREATE TABLE IF NOT EXISTS codes
 (

@@ -227,3 +227,10 @@ func (a *Auth) ParseToken(ctx context.Context, token string) (string, error) {
 	}
 	return id, nil
 }
+
+func (a *Auth) UpdateOnline(ctx context.Context, uuid string) error {
+	if err := a.repo.UpdateOnline(ctx, uuid); err != nil {
+		return fmt.Errorf("repo error: %w", err)
+	}
+	return nil
+}

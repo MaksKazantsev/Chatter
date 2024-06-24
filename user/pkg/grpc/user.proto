@@ -16,6 +16,7 @@ service User {
 
   rpc SuggestFriendShip(SuggestFriendShipReq) returns (google.protobuf.Empty);
   rpc RefuseFriendShip(RefuseFriendShipReq) returns (google.protobuf.Empty);
+  rpc UpdateOnline(UpdateOnlineReq) returns (google.protobuf.Empty);
 }
 
 message RegisterReq {
@@ -82,4 +83,8 @@ message SuggestFriendShipReq {
 message RefuseFriendShipReq {
   string Sender = 1;
   string Token = 2;
+}
+
+message UpdateOnlineReq {
+  string UUID = 1;
 }

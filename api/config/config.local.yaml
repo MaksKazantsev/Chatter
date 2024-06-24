@@ -3,3 +3,4 @@ port: 3000
 host: localhost
 services:
   authAddr: localhost:3001
+  messagesAddr: localhost:3002

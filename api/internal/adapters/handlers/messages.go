@@ -1,0 +1,71 @@
+package handlers
+
+import (
+	"context"
+	"encoding/json"
+	"github.com/MaksKazantsev/Chatter/api/internal/clients"
+	"github.com/MaksKazantsev/Chatter/api/internal/models"
+	"github.com/gofiber/contrib/websocket"
+	"github.com/gofiber/fiber/v2"
+	"sort"
+	"strings"
+	"sync"
+)
+
+type Messages struct {
+	cl    clients.Messages
+	conns map[string]*websocket.Conn
+	mu    sync.RWMutex
+}
+
+func NewMessages(cl clients.Messages) *Messages {
+	return &Messages{cl: cl, conns: make(map[string]*websocket.Conn)}
+}
+
+func (m *Messages) Join(c *websocket.Conn) {
+	id := c.Query("id")
+
+	m.mu.Lock()
+	m.conns[id] = c
+	m.mu.Unlock()
+
+	for {
+		mt, msg, err := c.ReadMessage()
+		if err != nil || mt == websocket.CloseMessage {
+			return
+		}
+		var message models.Message
+		if err = json.Unmarshal(msg, &message); err != nil {
+			return
+		}
+		message.SenderID = id
+		s := strings.Split(id+message.ReceiverID, "")
+		sort.Strings(s)
+		chatID := strings.Join(s, "")
+		message.ChatID = chatID
+
+		var receiverOffline bool
+		m.mu.RLock()
+		if _, ok := m.conns[message.ReceiverID]; !ok {
+			receiverOffline = true
+		}
+		m.mu.RUnlock()
+
+		if err = m.cl.CreateMessage(context.Background(), &message, receiverOffline); err != nil {
+			return
+		}
+
+		m.mu.RLock()
+		if !receiverOffline {
+			_ = m.conns[message.ReceiverID].WriteJSON(message)
+		}
+		_ = m.conns[id].WriteJSON(message)
+		m.mu.RUnlock()
+	}
+}
+
+func (m *Messages) DeleteMessage(c *fiber.Ctx) error {
+	id := c.Params("id")
+
+	err := m.cl.DeleteMessage(c.Context(), id)
+}
