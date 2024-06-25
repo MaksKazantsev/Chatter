@@ -7,6 +7,7 @@ import (
 	"github.com/MaksKazantsev/Chatter/user/internal/log"
 	"github.com/MaksKazantsev/Chatter/user/internal/models"
 	"github.com/MaksKazantsev/Chatter/user/internal/utils"
+	"strings"
 	"time"
 )
 
@@ -26,6 +27,10 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 	q := `INSERT INTO users (uuid,email,username,password,refresh,isverified,joined) VALUES($1,$2,$3,$4,$5,$6,$7)`
 	_, err = tx.Exec(q, req.UUID, req.Email, req.Username, req.Password, req.Refresh, false, time.Now())
 	if err != nil {
+		if strings.Contains(err.Error(), "duplicate key") {
+			_ = tx.Rollback()
+			return utils.NewError("user with this email already exists", utils.ErrBadRequest)
+		}
 		_ = tx.Rollback()
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
@@ -38,7 +43,7 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
-	log.GetLogger(ctx).Debug("db layer success")
+	log.GetLogger(ctx).Debug("Database layer success")
 	return tx.Commit()
 }
 
@@ -60,7 +65,7 @@ func (p *Postgres) Login(ctx context.Context, req models.LogReq) error {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
-	log.GetLogger(ctx).Debug("db layer success")
+	log.GetLogger(ctx).Debug("Database layer success")
 	return nil
 }
 
@@ -111,7 +116,7 @@ func (p *Postgres) EmailVerifyCode(ctx context.Context, code, email, t string) (
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
-	log.GetLogger(ctx).Debug("db layer success")
+	log.GetLogger(ctx).Debug("Database layer success")
 	return uuid, nil
 }
 
@@ -160,7 +165,7 @@ func (p *Postgres) PasswordRecovery(ctx context.Context, cr models.Credentials) 
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
-	log.GetLogger(ctx).Debug("db layer success")
+	log.GetLogger(ctx).Debug("Database layer success")
 	return tx.Commit()
 }
 
@@ -173,5 +178,7 @@ func (p *Postgres) UpdateOnline(ctx context.Context, uuid string) error {
 		}
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
+
+	log.GetLogger(ctx).Debug("Database layer success")
 	return nil
 }

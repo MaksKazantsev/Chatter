@@ -1,6 +1,6 @@
 services:
   postgres:
-    container_name: auth_postgres
+    container_name: user_postgres
     image: postgres
     restart: on-failure
     ports:
@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: user
     volumes:
-      - data:/etc/data/postgres/auth_postgres
+      - data:/etc/data/postgres/user_postgres
 
 
 volumes:

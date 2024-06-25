@@ -25,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type MessagesClient interface {
 	CreateMessage(ctx context.Context, in *CreateMessageReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteMessage(ctx context.Context, in *DeleteMessageReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetHistory(ctx context.Context, in *GetHistoryReq, opts ...grpc.CallOption) (*GetHistoryRes, error)
 }
 
 type messagesClient struct {
@@ -53,12 +54,22 @@ func (c *messagesClient) DeleteMessage(ctx context.Context, in *DeleteMessageReq
 	return out, nil
 }
 
+func (c *messagesClient) GetHistory(ctx context.Context, in *GetHistoryReq, opts ...grpc.CallOption) (*GetHistoryRes, error) {
+	out := new(GetHistoryRes)
+	err := c.cc.Invoke(ctx, "/Messages/GetHistory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessagesServer is the server API for Messages service.
 // All implementations must embed UnimplementedMessagesServer
 // for forward compatibility
 type MessagesServer interface {
 	CreateMessage(context.Context, *CreateMessageReq) (*emptypb.Empty, error)
 	DeleteMessage(context.Context, *DeleteMessageReq) (*emptypb.Empty, error)
+	GetHistory(context.Context, *GetHistoryReq) (*GetHistoryRes, error)
 	mustEmbedUnimplementedMessagesServer()
 }
 
@@ -71,6 +82,9 @@ func (UnimplementedMessagesServer) CreateMessage(context.Context, *CreateMessage
 }
 func (UnimplementedMessagesServer) DeleteMessage(context.Context, *DeleteMessageReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteMessage not implemented")
+}
+func (UnimplementedMessagesServer) GetHistory(context.Context, *GetHistoryReq) (*GetHistoryRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetHistory not implemented")
 }
 func (UnimplementedMessagesServer) mustEmbedUnimplementedMessagesServer() {}
 
@@ -121,6 +135,24 @@ func _Messages_DeleteMessage_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Messages_GetHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHistoryReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessagesServer).GetHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Messages/GetHistory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessagesServer).GetHistory(ctx, req.(*GetHistoryReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Messages_ServiceDesc is the grpc.ServiceDesc for Messages service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -135,6 +167,10 @@ var Messages_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMessage",
 			Handler:    _Messages_DeleteMessage_Handler,
+		},
+		{
+			MethodName: "GetHistory",
+			Handler:    _Messages_GetHistory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

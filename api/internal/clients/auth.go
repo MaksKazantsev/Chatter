@@ -16,8 +16,6 @@ type User interface {
 	VerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, string, error)
 	PasswordRecovery(ctx context.Context, req models.RecoveryReq) error
 	UpdateTokens(ctx context.Context, refresh string) (string, string, error)
-	SuggestFriendShip(ctx context.Context, req models.FriendShipReq) error
-	RefuseFriendShip(ctx context.Context, req models.RefuseFriendShipReq) error
 	ParseToken(ctx context.Context, token string) (string, error)
 }
 

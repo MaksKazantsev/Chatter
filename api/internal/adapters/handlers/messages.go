@@ -70,9 +70,10 @@ func (m *Messages) Join(c *websocket.Conn) {
 }
 
 func (m *Messages) DeleteMessage(c *fiber.Ctx) error {
+	token := parseAuthHeader(c)
 	id := c.Params("id")
 
-	err := m.cl.DeleteMessage(c.Context(), id)
+	err := m.cl.DeleteMessage(c.Context(), id, token)
 	if err != nil {
 		code, msg := utils.HandleError(err)
 		_ = c.Status(code).SendString(msg)

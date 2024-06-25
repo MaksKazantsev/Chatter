@@ -26,8 +26,6 @@ func NewAuth(repo db.Auth) *Auth {
 }
 
 func (a *Auth) UpdateTokens(ctx context.Context, refresh string) (string, string, error) {
-	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
 
 	// parse token
 
@@ -49,6 +47,9 @@ func (a *Auth) UpdateTokens(ctx context.Context, refresh string) (string, string
 	if err != nil {
 		return "", "", fmt.Errorf("failed to generate token: %w", err)
 	}
+
+	// logging
+	log.GetLogger(ctx).Debug("Service layer success")
 
 	if err = a.repo.UpdateRToken(ctx, userID, rToken); err != nil {
 		return "", "", fmt.Errorf("repo error: %w", err)
@@ -79,7 +80,7 @@ func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, 
 	req.Refresh = rToken
 
 	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
+	log.GetLogger(ctx).Debug("Service layer success")
 
 	// calling repo method
 	if err = a.repo.Register(ctx, req); err != nil {
@@ -108,9 +109,6 @@ func (a *Auth) Register(ctx context.Context, req models.RegReq) (models.RegRes, 
 }
 
 func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, error) {
-	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
-
 	// get password
 	res, err := a.repo.GetHashAndID(ctx, req.Email)
 	if err != nil {
@@ -133,6 +131,9 @@ func (a *Auth) Login(ctx context.Context, req models.LogReq) (string, string, er
 	}
 	req.Refresh = rToken
 
+	// logging
+	log.GetLogger(ctx).Debug("Service layer success")
+
 	// login
 	err = a.repo.Login(ctx, req)
 	if err != nil {
@@ -152,7 +153,7 @@ func (a *Auth) PasswordRecovery(ctx context.Context, cr models.Credentials) erro
 	cr.Password = hashed
 
 	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
+	log.GetLogger(ctx).Debug("Service layer success")
 
 	// calling repo method
 	err = a.repo.PasswordRecovery(ctx, cr)
@@ -167,7 +168,7 @@ func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
 	code := strconv.Itoa(rand.Intn(9009) + 1000)
 
 	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
+	log.GetLogger(ctx).Debug("Service layer success")
 
 	// send code
 	if err := a.smtp.SendCode(code, email); err != nil {
@@ -183,7 +184,7 @@ func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
 
 func (a *Auth) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
 	// logging
-	log.GetLogger(ctx).Debug("uc layer success ✔")
+	log.GetLogger(ctx).Debug("Service layer success")
 
 	// calling repo method
 	id, err := a.repo.EmailVerifyCode(ctx, code, email, t)
@@ -225,10 +226,16 @@ func (a *Auth) ParseToken(ctx context.Context, token string) (string, error) {
 	if time.Now().After(time.Unix(int64(exp), 0)) {
 		return "", fmt.Errorf("expired token: %w", err)
 	}
+
+	// logging
+	log.GetLogger(ctx).Debug("Service layer success")
+
 	return id, nil
 }
 
 func (a *Auth) UpdateOnline(ctx context.Context, uuid string) error {
+	// logging
+	log.GetLogger(ctx).Debug("Service layer success")
 	if err := a.repo.UpdateOnline(ctx, uuid); err != nil {
 		return fmt.Errorf("repo error: %w", err)
 	}

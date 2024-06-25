@@ -3,8 +3,8 @@ module github.com/MaksKazantsev/Chatter/api
 go 1.22.1
 
 require (
-	github.com/MaksKazantsev/Chatter v0.0.0-20240624094227-2e0135306355
-	github.com/MaksKazantsev/Chatter/user v0.0.0-20240624094227-2e0135306355
+	github.com/MaksKazantsev/Chatter/messages v0.0.0-20240625133451-28bf5913f22a
+	github.com/MaksKazantsev/Chatter/user v0.0.0-20240625133451-28bf5913f22a
 	github.com/goccy/go-yaml v1.11.3
 	github.com/gofiber/contrib/websocket v1.3.1
 	github.com/gofiber/fiber/v2 v2.52.4

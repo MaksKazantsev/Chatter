@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"github.com/MaksKazantsev/Chatter/messages/internal/log"
 	"github.com/MaksKazantsev/Chatter/messages/internal/models"
 	"github.com/MaksKazantsev/Chatter/messages/internal/utils"
 )
@@ -47,7 +48,7 @@ func (p *Postgres) CreateMessage(ctx context.Context, msg *models.Message, recei
 	}
 
 	if receiverOffline {
-		q = `UPDATE chat_members SET missed = missed + 1 WHERE chatid = $1 AND receiverID = $2`
+		q = `UPDATE chat_members SET missed = missed + 1 WHERE chatid = $1 AND userid = $2`
 		_, err = p.Exec(q, msg.ChatID, msg.SenderID)
 		if err != nil {
 			return utils.NewError(err.Error(), utils.ErrInternal)
@@ -59,6 +60,8 @@ func (p *Postgres) CreateMessage(ctx context.Context, msg *models.Message, recei
 	if err != nil {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
+
+	log.GetLogger(ctx).Info("Database layer success")
 	return nil
 }
 
@@ -71,5 +74,30 @@ func (p *Postgres) DeleteMessage(ctx context.Context, messageID string) error {
 		}
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
+	log.GetLogger(ctx).Info("Database layer success")
 	return nil
+}
+
+func (p *Postgres) GetHistory(ctx context.Context, req models.GetHistoryReq, uuid string) ([]models.Message, error) {
+	var msgs []models.Message
+	var msg models.Message
+
+	q := `SELECT * FROM messages WHERE chatid = $1 ORDER BY sentat DESC`
+	rows, err := p.Queryx(q, req.ChatID)
+	for rows.Next() {
+		_ = rows.StructScan(&msg)
+		msgs = append(msgs, msg)
+	}
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return []models.Message{}, nil
+		}
+		return nil, utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	q = `UPDATE chat_members SET missed = 0 WHERE chatid = $1 AND userid = $2`
+	_, err = p.Exec(q, req.ChatID, uuid)
+	if err != nil {
+		return nil, utils.NewError(err.Error(), utils.ErrInternal)
+	}
+	return msgs, nil
 }

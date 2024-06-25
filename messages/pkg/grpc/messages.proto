@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/MaksKazantsev/Chatter/user/pkg";
 
@@ -8,6 +9,7 @@ option go_package = "github.com/MaksKazantsev/Chatter/user/pkg";
 service Messages {
   rpc CreateMessage(CreateMessageReq) returns (google.protobuf.Empty);
   rpc DeleteMessage(DeleteMessageReq) returns (google.protobuf.Empty);
+  rpc GetHistory(GetHistoryReq) returns (GetHistoryRes);
 }
 
 message CreateMessageReq {
@@ -22,4 +24,22 @@ message CreateMessageReq {
 message DeleteMessageReq {
   string MessageID = 1;
   string Token = 2;
+}
+
+message GetHistoryReq {
+  string Token = 1;
+  string ChatID =  2;
+}
+
+message GetHistoryRes {
+  repeated Message Messages = 1;
+}
+
+message Message {
+  string ChatID = 1;
+  string SenderID = 2;
+  string ReceiverID = 3;
+  string MessageID = 4;
+  string Value = 5;
+  google.protobuf.Timestamp SentAt = 6;
 }

@@ -12,4 +12,5 @@ type Repository interface {
 type Messages interface {
 	CreateMessage(ctx context.Context, msg *models.Message, receiverOffline bool) error
 	DeleteMessage(ctx context.Context, messageID string) error
+	GetHistory(ctx context.Context, req models.GetHistoryReq, uuid string) ([]models.Message, error)
 }

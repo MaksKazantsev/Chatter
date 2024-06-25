@@ -31,5 +31,5 @@ func InitRoutes(app *fiber.App, ctrl *Controller) {
 	auth.Get("/refresh", ctrl.User.UpdateTokens)
 
 	ch := app.Group("/chat")
-	ch.Delete("/message/:id", ctrl.Messages.DeleteMessage)
+	ch.Get("/message/:id", ctrl.Messages.DeleteMessage)
 }

@@ -3,12 +3,12 @@ package models
 import "time"
 
 type Message struct {
-	ChatID     string
-	SenderID   string
-	ReceiverID string
-	MessageID  string
-	Value      string
-	SentAt     time.Time
+	ChatID     string    `db:"chatid"`
+	SenderID   string    `db:"senderid"`
+	ReceiverID string    `db:"receiverid"`
+	MessageID  string    `db:"messageid"`
+	Value      string    `db:"val"`
+	SentAt     time.Time `db:"sentat"`
 }
 
 type Chat struct {

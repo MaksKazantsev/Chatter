@@ -6,8 +6,8 @@ import (
 )
 
 type Repository interface {
-	Auth
 	Friendship
+	Auth
 }
 
 type Auth interface {
@@ -21,8 +21,6 @@ type Auth interface {
 	UpdateOnline(ctx context.Context, uuid string) error
 }
 type Friendship interface {
-	SuggestFriendShip(ctx context.Context, sender, receiver string) error
-	RefuseFriendShip(ctx context.Context, sender, receiver string) error
 }
 
 type HashAndID struct {

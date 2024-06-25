@@ -8,44 +8,13 @@ import (
 
 type Converter interface {
 	ToPb
-	ToService
 }
 
 func NewConverter() Converter {
 	return &converter{}
 }
 
-type converter struct {
-}
-
-func (c converter) CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq {
-	return &messagesPkg.CreateMessageReq{Token: req.Token, SenderID: req.SenderID, ReceiverID: req.ReceiverID, ChatID: req.ChatID, Value: req.Value, ReceiverOffline: receiverOffline}
-}
-
-func (c converter) DeleteMsgToPb(messageID string) *messagesPkg.DeleteMessageReq {
-	return &messagesPkg.DeleteMessageReq{MessageID: messageID}
-}
-
-func (c converter) UpdateTokensToPb(req string) *userPkg.UpdateTokenReq {
-	return &userPkg.UpdateTokenReq{RToken: req}
-}
-func (c converter) ParseTokenToPb(req string) *userPkg.ParseTokenReq {
-	return &userPkg.ParseTokenReq{Token: req}
-}
-
-func (c converter) SuggestFs(req models.FriendShipReq) *userPkg.SuggestFriendShipReq {
-	return &userPkg.SuggestFriendShipReq{Token: req.Token, Receiver: req.Receiver}
-}
-
-func (c converter) RefuseFs(req models.RefuseFriendShipReq) *userPkg.RefuseFriendShipReq {
-	return &userPkg.RefuseFriendShipReq{Token: req.Token, Sender: req.Sender}
-}
-
-func (c converter) UpdateTokens(req string) *userPkg.UpdateTokenReq {
-	return &userPkg.UpdateTokenReq{
-		RToken: req,
-	}
-}
+type converter struct{}
 
 type ToPb interface {
 	RegReqToPb(req models.SignupReq) *userPkg.RegisterReq
@@ -55,12 +24,11 @@ type ToPb interface {
 	RecoveryReqToPb(req models.RecoveryReq) *userPkg.RecoveryReq
 	UpdateTokensToPb(req string) *userPkg.UpdateTokenReq
 	ParseTokenToPb(req string) *userPkg.ParseTokenReq
-	DeleteMsgToPb(messageID string) *messagesPkg.DeleteMessageReq
+	DeleteMsgToPb(messageID, token string) *messagesPkg.DeleteMessageReq
 	CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq
 }
 
-type ToService interface {
-}
+// User Microservice
 
 func (c converter) RecoveryReqToPb(req models.RecoveryReq) *userPkg.RecoveryReq {
 	return &userPkg.RecoveryReq{
@@ -92,4 +60,43 @@ func (c converter) RegReqToPb(req models.SignupReq) *userPkg.RegisterReq {
 		Password: req.Password,
 		Email:    req.Email,
 	}
+}
+
+func (c converter) UpdateTokensToPb(req string) *userPkg.UpdateTokenReq {
+	return &userPkg.UpdateTokenReq{RToken: req}
+}
+func (c converter) ParseTokenToPb(req string) *userPkg.ParseTokenReq {
+	return &userPkg.ParseTokenReq{Token: req}
+}
+func (c converter) UpdateTokens(req string) *userPkg.UpdateTokenReq {
+	return &userPkg.UpdateTokenReq{
+		RToken: req,
+	}
+}
+
+// Messages Microservice
+/*
+func (c converter) MessageToService(messages []*messagesPkg.Message) []models.Message {
+	var msg models.Message
+	msgs := make([]models.Message, len(messages))
+	for i, _ := range messages {
+		msg.MessageID = messages[i].MessageID
+		msg.SenderID = messages[i].SenderID
+		msg.ReceiverID = messages[i].ReceiverID
+		msg.Value = messages[i].Value
+		msg.ChatID = messages[i].ChatID
+		msg.SentAt = messages[i].SentAt.AsTime()
+		msgs = append(msgs, msg)
+	}
+	return msgs
+}
+
+*/
+
+func (c converter) CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq {
+	return &messagesPkg.CreateMessageReq{Token: req.Token, SenderID: req.SenderID, ReceiverID: req.ReceiverID, ChatID: req.ChatID, Value: req.Value, ReceiverOffline: receiverOffline}
+}
+
+func (c converter) DeleteMsgToPb(messageID, token string) *messagesPkg.DeleteMessageReq {
+	return &messagesPkg.DeleteMessageReq{MessageID: messageID, Token: token}
 }
