@@ -31,8 +31,8 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 	}
 
 	// Creating user profile
-	q = `INSERT INTO user_profiles (uuid,username,email,birthday,bio,lastonline,firstname,secondname) VALUES($1,$2,$3,$4,$5,$6,$7,$8)`
-	_, err = tx.Exec(q, req.UUID, req.Username, req.Email, " ", " ", time.Now(), " ", " ")
+	q = `INSERT INTO user_profiles (uuid,avatar,username,email,birthday,bio,lastonline,firstname,secondname) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`
+	_, err = tx.Exec(q, req.UUID, "", req.Username, req.Email, "", "", time.Now(), "", "")
 	if err != nil {
 		_ = tx.Rollback()
 		return utils.NewError(err.Error(), utils.ErrInternal)

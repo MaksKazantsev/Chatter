@@ -2,7 +2,7 @@ package clients
 
 import (
 	"github.com/MaksKazantsev/Chatter/api/internal/config"
-	messagesPkg "github.com/MaksKazantsev/Chatter/messages/internal/grpc"
+	messagesPkg "github.com/MaksKazantsev/Chatter/messages/pkg/grpc"
 	userPkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

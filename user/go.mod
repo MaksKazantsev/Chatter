@@ -3,7 +3,6 @@ module github.com/MaksKazantsev/Chatter/user
 go 1.22.1
 
 require (
-	github.com/MaksKazantsev/SSO/auth v0.0.0-20240619182737-e4f85306624e
 	github.com/goccy/go-yaml v1.11.3
 	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/golang-migrate/migrate/v4 v4.17.1

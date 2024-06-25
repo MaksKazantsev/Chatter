@@ -3,10 +3,10 @@ module github.com/MaksKazantsev/Chatter/api
 go 1.22.1
 
 require (
-	github.com/MaksKazantsev/Chatter/user v0.0.0-20240621201903-99a441eeccf9
-	github.com/MaksKazantsev/SSO/api v0.0.0-20240619182737-e4f85306624e
-	github.com/MaksKazantsev/SSO/auth v0.0.0-20240619182737-e4f85306624e
+	github.com/MaksKazantsev/Chatter v0.0.0-20240624094227-2e0135306355
+	github.com/MaksKazantsev/Chatter/user v0.0.0-20240624094227-2e0135306355
 	github.com/goccy/go-yaml v1.11.3
+	github.com/gofiber/contrib/websocket v1.3.1
 	github.com/gofiber/fiber/v2 v2.52.4
 	github.com/joho/godotenv v1.5.1
 	google.golang.org/grpc v1.64.0
@@ -16,7 +16,6 @@ require (
 	github.com/andybalholm/brotli v1.1.0 // indirect
 	github.com/fasthttp/websocket v1.5.8 // indirect
 	github.com/fatih/color v1.17.0 // indirect
-	github.com/gofiber/contrib/websocket v1.3.1 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.17.8 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

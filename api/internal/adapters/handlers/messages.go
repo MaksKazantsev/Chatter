@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"github.com/MaksKazantsev/Chatter/api/internal/clients"
 	"github.com/MaksKazantsev/Chatter/api/internal/models"
+	"github.com/MaksKazantsev/Chatter/api/internal/utils"
 	"github.com/gofiber/contrib/websocket"
 	"github.com/gofiber/fiber/v2"
+	"net/http"
 	"sort"
 	"strings"
 	"sync"
@@ -24,6 +26,7 @@ func NewMessages(cl clients.Messages) *Messages {
 
 func (m *Messages) Join(c *websocket.Conn) {
 	id := c.Query("id")
+	token := c.Query("token")
 
 	m.mu.Lock()
 	m.conns[id] = c
@@ -38,6 +41,8 @@ func (m *Messages) Join(c *websocket.Conn) {
 		if err = json.Unmarshal(msg, &message); err != nil {
 			return
 		}
+
+		message.Token = token
 		message.SenderID = id
 		s := strings.Split(id+message.ReceiverID, "")
 		sort.Strings(s)
@@ -68,4 +73,11 @@ func (m *Messages) DeleteMessage(c *fiber.Ctx) error {
 	id := c.Params("id")
 
 	err := m.cl.DeleteMessage(c.Context(), id)
+	if err != nil {
+		code, msg := utils.HandleError(err)
+		_ = c.Status(code).SendString(msg)
+		return nil
+	}
+	c.Status(http.StatusOK)
+	return nil
 }

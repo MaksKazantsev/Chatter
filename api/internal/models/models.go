@@ -3,10 +3,11 @@ package models
 import "time"
 
 type Message struct {
-	ChatID     string    `json:"-"`
-	SenderID   string    `json:"-"`
+	ChatID     string    `json:"chatID"`
+	SenderID   string    `json:"senderID"`
 	ReceiverID string    `json:"receiverID"`
-	MessageID  string    `json:"-"`
+	MessageID  string    `json:"messageID"`
 	Value      string    `json:"value"`
-	SentAt     time.Time `json:"-"`
+	SentAt     time.Time `json:"sentAt"`
+	Token      string    `json:"token"`
 }

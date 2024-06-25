@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"github.com/MaksKazantsev/Chatter/user/internal/log"
 	"github.com/MaksKazantsev/Chatter/user/internal/utils"
 	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
@@ -71,6 +72,7 @@ func (s *server) UpdateToken(ctx context.Context, req *pkg.UpdateTokenReq) (*pkg
 }
 
 func (s *server) ParseToken(ctx context.Context, req *pkg.ParseTokenReq) (*pkg.ParseTokenRes, error) {
+	fmt.Println("Received parse token req")
 	id, err := s.service.Auth.ParseToken(ctx, s.converter.ParseTokenReqToService(req))
 	if err != nil {
 		return nil, utils.HandleError(err)
