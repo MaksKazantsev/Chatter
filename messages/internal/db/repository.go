@@ -10,6 +10,6 @@ type Repository interface {
 }
 
 type Messages interface {
-	CreateMessage(ctx context.Context, msg *models.Message) error
+	CreateMessage(ctx context.Context, msg *models.Message, receiverOffline bool) error
 	DeleteMessage(ctx context.Context, messageID string) error
 }

@@ -1,0 +1,17 @@
+services:
+  postgres:
+    container_name: messages_postgres
+    image: postgres
+    restart: on-failure
+    ports:
+      - 4002:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: messages
+    volumes:
+      - data:/etc/data/postgres/messages_postgres
+
+
+volumes:
+  data:

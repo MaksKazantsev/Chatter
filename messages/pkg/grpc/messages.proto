@@ -16,8 +16,10 @@ message CreateMessageReq {
   string SenderID = 3;
   string ChatID = 4;
   string Value = 5;
+  bool ReceiverOffline = 6;
 }
 
 message DeleteMessageReq {
   string MessageID = 1;
+  string Token = 2;
 }
