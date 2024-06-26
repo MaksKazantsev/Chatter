@@ -35,4 +35,5 @@ func InitRoutes(app *fiber.App, ctrl *Controller) {
 
 	ch := app.Group("/chat")
 	ch.Get("/message/:id", ctrl.Messages.DeleteMessage)
+	ch.Get("/history/:receiverID", ctrl.Messages.GetHistory)
 }

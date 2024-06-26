@@ -2,6 +2,7 @@ package utils
 
 import (
 	"github.com/MaksKazantsev/Chatter/api/internal/models"
+	filesPkg "github.com/MaksKazantsev/Chatter/files/pkg/grpc"
 	messagesPkg "github.com/MaksKazantsev/Chatter/messages/pkg/grpc"
 	userPkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 )
@@ -26,6 +27,9 @@ type ToPb interface {
 	ParseTokenToPb(req string) *userPkg.ParseTokenReq
 	DeleteMsgToPb(messageID, token string) *messagesPkg.DeleteMessageReq
 	CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq
+	GetHistoryToPb(req models.GetHistoryReq) *messagesPkg.GetHistoryReq
+	UploadToPb(req models.UploadReq) *filesPkg.UploadReq
+	MessageToService(messages []*messagesPkg.Message) []models.Message
 }
 
 // User Microservice
@@ -75,23 +79,26 @@ func (c converter) UpdateTokens(req string) *userPkg.UpdateTokenReq {
 }
 
 // Messages Microservice
-/*
+
 func (c converter) MessageToService(messages []*messagesPkg.Message) []models.Message {
-	var msg models.Message
-	msgs := make([]models.Message, len(messages))
-	for i, _ := range messages {
-		msg.MessageID = messages[i].MessageID
-		msg.SenderID = messages[i].SenderID
-		msg.ReceiverID = messages[i].ReceiverID
-		msg.Value = messages[i].Value
-		msg.ChatID = messages[i].ChatID
-		msg.SentAt = messages[i].SentAt.AsTime()
+	var msgs []models.Message
+	for i := 0; i < len(messages); i++ {
+		msg := models.Message{
+			MessageID:  messages[i].MessageID,
+			SenderID:   messages[i].SenderID,
+			ReceiverID: messages[i].ReceiverID,
+			SentAt:     messages[i].SentAt.AsTime(),
+			ChatID:     messages[i].ChatID,
+			Value:      messages[i].Value,
+		}
 		msgs = append(msgs, msg)
 	}
 	return msgs
 }
 
-*/
+func (c converter) GetHistoryToPb(req models.GetHistoryReq) *messagesPkg.GetHistoryReq {
+	return &messagesPkg.GetHistoryReq{Token: req.Token, ChatID: req.ChatID}
+}
 
 func (c converter) CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq {
 	return &messagesPkg.CreateMessageReq{Token: req.Token, SenderID: req.SenderID, ReceiverID: req.ReceiverID, ChatID: req.ChatID, Value: req.Value, ReceiverOffline: receiverOffline}
@@ -99,4 +106,14 @@ func (c converter) CreateMsgToPb(req *models.Message, receiverOffline bool) *mes
 
 func (c converter) DeleteMsgToPb(messageID, token string) *messagesPkg.DeleteMessageReq {
 	return &messagesPkg.DeleteMessageReq{MessageID: messageID, Token: token}
+}
+
+// Files microservice
+
+func (c converter) UploadToPb(req models.UploadReq) *filesPkg.UploadReq {
+	return &filesPkg.UploadReq{
+		Token:   req.Token,
+		PhotoID: req.PhotoID,
+		Photo:   req.Photo,
+	}
 }

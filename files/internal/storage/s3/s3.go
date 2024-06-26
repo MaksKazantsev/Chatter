@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/MaksKazantsev/Chatter/files/internal/storage"
 	"github.com/MaksKazantsev/Chatter/files/internal/utils"
+	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v6"
 	"os"
 )
@@ -15,11 +16,14 @@ type Strg struct {
 }
 
 func (s Strg) Upload(ctx context.Context, id string, val []byte) (string, error) {
+	godotenv.Load(".env")
+
 	accessKey := os.Getenv("AWS_ACCESS_KEY")
 	secretKey := os.Getenv("AWS_SECRET_KEY")
 	bucketName := "b9b14e14-29afa9b5-ceb5-4e04-b798-0b903a19130d"
+	fmt.Println(accessKey)
 
-	cl, err := minio.New("s3.timeweb.com", accessKey, secretKey, false)
+	cl, err := minio.New("s3.timeweb.cloud", accessKey, secretKey, false)
 	if err != nil {
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}
@@ -38,7 +42,8 @@ func (s Strg) Upload(ctx context.Context, id string, val []byte) (string, error)
 var _ storage.Storage = &Strg{}
 
 func NewStorage() *Strg {
-	cl, err := minio.New("s3.timeweb.com", os.Getenv("AWS_ACCESS_KEY"), os.Getenv("AWS_SECRET_KEY"), false)
+	godotenv.Load(".env")
+	cl, err := minio.New("s3.timeweb.cloud", os.Getenv("AWS_ACCESS_KEY"), os.Getenv("AWS_SECRET_KEY"), false)
 
 	if err != nil {
 		panic(err)

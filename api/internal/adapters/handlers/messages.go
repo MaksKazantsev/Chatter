@@ -82,3 +82,19 @@ func (m *Messages) DeleteMessage(c *fiber.Ctx) error {
 	c.Status(http.StatusOK)
 	return nil
 }
+
+func (m *Messages) GetHistory(c *fiber.Ctx) error {
+	var req models.GetHistoryReq
+	req.Token = parseAuthHeader(c)
+	req.ChatID = c.Params("receiverID")
+
+	messages, err := m.cl.GetHistory(c.Context(), req)
+	if err != nil {
+		st, msg := utils.HandleError(err)
+		_ = c.Status(st).SendString(msg)
+		return nil
+	}
+	_ = c.JSON(fiber.Map{"messages": messages})
+	c.Status(http.StatusOK)
+	return nil
+}

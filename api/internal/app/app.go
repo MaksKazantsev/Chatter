@@ -25,7 +25,7 @@ func MustStart(cfg *config.Config) {
 	l.Info("Controller initiated")
 
 	// New app
-	app := fiber.New()
+	app := fiber.New(fiber.Config{BodyLimit: 15 * 1024 * 1024})
 
 	// Init routes
 	adapters.InitRoutes(app, ctrl)

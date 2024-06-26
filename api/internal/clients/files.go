@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"github.com/MaksKazantsev/Chatter/api/internal/models"
 	"github.com/MaksKazantsev/Chatter/api/internal/utils"
 	pkg "github.com/MaksKazantsev/Chatter/files/pkg/grpc"
 	"golang.org/x/net/context"
@@ -20,6 +21,14 @@ type filesCl struct {
 }
 
 func (f filesCl) Upload(ctx context.Context, fileID, token string, val []byte) (string, error) {
-	
-	return fileLink, nil
+	req := models.UploadReq{
+		Token:   token,
+		Photo:   val,
+		PhotoID: fileID,
+	}
+	res, err := f.cl.UploadToStorage(ctx, f.c.UploadToPb(req))
+	if err != nil {
+		return "", utils.GRPCErrorToError(err)
+	}
+	return res.PhotoLink, nil
 }

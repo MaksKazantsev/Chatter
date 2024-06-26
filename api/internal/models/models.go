@@ -9,5 +9,5 @@ type Message struct {
 	MessageID  string    `json:"messageID"`
 	Value      string    `json:"value"`
 	SentAt     time.Time `json:"sentAt"`
-	Token      string    `json:"token"`
+	Token      string    `json:"-"`
 }

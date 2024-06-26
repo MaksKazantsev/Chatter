@@ -34,3 +34,14 @@ type RefuseFriendShipReq struct {
 	Token  string `json:"-"`
 	Sender string `json:"sender"`
 }
+
+type GetHistoryReq struct {
+	ChatID string `json:"chatID"`
+	Token  string `json:"token"`
+}
+
+type UploadReq struct {
+	PhotoID string `json:"photoID"`
+	Photo   []byte `json:"photo"`
+	Token   string `json:"token"`
+}

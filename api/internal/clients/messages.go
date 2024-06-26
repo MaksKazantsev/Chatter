@@ -10,6 +10,7 @@ import (
 type Messages interface {
 	CreateMessage(ctx context.Context, msg *models.Message, receiverOffline bool) error
 	DeleteMessage(ctx context.Context, messageID, token string) error
+	GetHistory(ctx context.Context, req models.GetHistoryReq) ([]models.Message, error)
 }
 
 func NewMessages(cl pkg.MessagesClient) Messages {
@@ -33,4 +34,12 @@ func (m *messagesCl) CreateMessage(ctx context.Context, msg *models.Message, rec
 		return utils.GRPCErrorToError(err)
 	}
 	return nil
+}
+
+func (m *messagesCl) GetHistory(ctx context.Context, req models.GetHistoryReq) ([]models.Message, error) {
+	res, err := m.cl.GetHistory(ctx, m.c.GetHistoryToPb(req))
+	if err != nil {
+		return nil, utils.GRPCErrorToError(err)
+	}
+	return m.c.MessageToService(res.Messages), nil
 }

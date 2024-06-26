@@ -7,6 +7,8 @@ import (
 	"github.com/MaksKazantsev/Chatter/messages/internal/log"
 	"github.com/MaksKazantsev/Chatter/messages/internal/models"
 	"github.com/google/uuid"
+	"sort"
+	"strings"
 	"time"
 )
 
@@ -40,6 +42,11 @@ func (m *Messages) DeleteMessage(ctx context.Context, messageID string) error {
 
 func (m *Messages) GetHistory(ctx context.Context, req models.GetHistoryReq, uuid string) ([]models.Message, error) {
 	log.GetLogger(ctx).Info("Service layer success")
+
+	s := strings.Split(req.ChatID+uuid, "")
+	sort.Strings(s)
+	req.ChatID = strings.Join(s, "")
+
 	res, err := m.repo.GetHistory(ctx, req, uuid)
 	if err != nil {
 		return nil, fmt.Errorf("repo error: %w", err)
