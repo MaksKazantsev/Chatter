@@ -10,17 +10,20 @@ import (
 type Controller struct {
 	User     *handlers.User
 	Messages *handlers.Messages
+	Files    *handlers.Files
 }
 
 func NewController(clients clients.Clients) *Controller {
 	return &Controller{
 		User:     handlers.NewUser(clients.UserClient),
 		Messages: handlers.NewMessages(clients.MessagesClient),
+		Files:    handlers.NewFiles(clients.FilesClient),
 	}
 }
 
 func InitRoutes(app *fiber.App, ctrl *Controller) {
 	app.Get("/chat/ws/join", websocket.New(ctrl.Messages.Join))
+	app.Post("/files/upload", ctrl.Files.Upload)
 
 	auth := app.Group("/auth")
 	auth.Post("/register", ctrl.User.Register)

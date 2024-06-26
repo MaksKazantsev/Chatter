@@ -2,21 +2,33 @@ package config
 
 import (
 	"flag"
+	"fmt"
 	"github.com/goccy/go-yaml"
 	"github.com/joho/godotenv"
 	"os"
 )
 
 type Config struct {
-	Env      string   `yaml:"env"`
 	Port     string   `yaml:"port"`
+	Env      string   `yaml:"env"`
+	DB       Postgres `yaml:"db"`
 	Services Services `yaml:"services"`
 }
 
+type Postgres struct {
+	Port     string `yaml:"port"`
+	Host     string `yaml:"host"`
+	Password string `yaml:"password"`
+	User     string `yaml:"user"`
+	Name     string `yaml:"name"`
+}
+
 type Services struct {
-	AuthAddr     string `yaml:"authAddr" env-default:"127.0.0.1:3001"`
-	MessagesAddr string `yaml:"messagesAddr" env-default:"127.0.0.1:3002"`
-	FilesAddr    string `yaml:"filesAddr" env-default:"127.0.0.1:3003"`
+	AuthAddr string `yaml:"authAddr" env-default:"127.0.0.1:3001"`
+}
+
+func (p *Postgres) GetAddr() string {
+	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", p.User, p.Password, p.Host, p.Port, p.Name)
 }
 
 func MustInit() *Config {

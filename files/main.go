@@ -1,5 +1,10 @@
 package main
 
+import (
+	"github.com/MaksKazantsev/Chatter/files/internal/app"
+	"github.com/MaksKazantsev/Chatter/files/internal/config"
+)
+
 func main() {
-	// TODO: Files microservice
+	app.MustStart(config.MustInit())
 }

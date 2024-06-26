@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+
+option go_package = "github.com/MaksKazantsev/Chatter/files/pkg";
+
+service Files {
+  rpc UploadToStorage(UploadReq) returns (UploadRes);
+}
+
+message UploadReq {
+  string Token = 1;
+  string PhotoID = 2;
+  bytes Photo = 3;
+}
+
+message UploadRes {
+  string PhotoLink = 1;
+}

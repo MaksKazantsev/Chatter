@@ -2,6 +2,7 @@ package clients
 
 import (
 	"github.com/MaksKazantsev/Chatter/api/internal/config"
+	filesPkg "github.com/MaksKazantsev/Chatter/files/pkg/grpc"
 	messagesPkg "github.com/MaksKazantsev/Chatter/messages/pkg/grpc"
 	userPkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 	"google.golang.org/grpc"
@@ -11,6 +12,7 @@ import (
 type Clients struct {
 	UserClient     User
 	MessagesClient Messages
+	FilesClient    Files
 }
 
 func Connect(cfg config.Services) Clients {
@@ -23,6 +25,8 @@ func Connect(cfg config.Services) Clients {
 	if err != nil {
 		panic("failed to dial to messages")
 	}
+	filesCC, err := dial(cfg.FilesAddr)
+	cli.FilesClient = NewFiles(filesPkg.NewFilesClient(filesCC))
 	cli.UserClient = NewUserAuth(userPkg.NewUserClient(authCC))
 	cli.MessagesClient = NewMessages(messagesPkg.NewMessagesClient(messagesCC))
 	return cli

@@ -18,9 +18,11 @@ func MustStart(cfg *config.Config) {
 	l.Info("Logger init success")
 
 	cl := clients.Connect(cfg.Services)
+	l.Info("Clients connected")
 
 	// New controller
 	ctrl := adapters.NewController(cl)
+	l.Info("Controller initiated")
 
 	// New app
 	app := fiber.New()

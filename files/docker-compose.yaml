@@ -1,0 +1,17 @@
+services:
+  postgres:
+    container_name: files_postgres
+    image: postgres
+    restart: on-failure
+    ports:
+      - 4003:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: files
+    volumes:
+      - data:/etc/data/postgres/files_postgres
+
+
+volumes:
+  data:
