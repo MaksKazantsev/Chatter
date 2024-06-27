@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/MaksKazantsev/Chatter/user/pkg";
 
@@ -14,9 +15,12 @@ service User {
   rpc UpdateToken(UpdateTokenReq) returns (UpdateTokenRes);
   rpc ParseToken(ParseTokenReq) returns (ParseTokenRes);
 
-  rpc SuggestFriendShip(SuggestFriendShipReq) returns (google.protobuf.Empty);
-  rpc RefuseFriendShip(RefuseFriendShipReq) returns (google.protobuf.Empty);
+
+  rpc EditProfile(EditProfileReq) returns (google.protobuf.Empty);
   rpc UpdateOnline(UpdateOnlineReq) returns (google.protobuf.Empty);
+  rpc SuggestFs(SuggestFsReq) returns (google.protobuf.Empty);
+  rpc RefuseFs(RefuseFsReq) returns (google.protobuf.Empty);
+  rpc GetFs(GetFsReq) returns (GetFsRes);
 }
 
 message RegisterReq {
@@ -75,16 +79,39 @@ message ParseTokenReq{
 message ParseTokenRes{
   string UUID = 1;
 }
-message SuggestFriendShipReq {
-  string Receiver = 1;
-  string Token = 2;
-}
-
-message RefuseFriendShipReq {
-  string Sender = 1;
-  string Token = 2;
-}
 
 message UpdateOnlineReq {
   string UUID = 1;
+}
+
+message EditProfileReq {
+  string Token = 1;
+  string Avatar = 2;
+  string Username = 3;
+  string Firstname = 4;
+  string Secondname = 5;
+  google.protobuf.Timestamp Birthday = 6;
+  string Bio = 7;
+}
+
+message SuggestFsReq {
+  string Token = 1;
+  string ReceiverID = 2;
+}
+
+message RefuseFsReq {
+  string Token = 1;
+  string SenderID = 2;
+}
+message GetFsReq {
+  string Token = 1;
+}
+message GetFsRes {
+  repeated FsReq FsReqs = 1;
+}
+message FsReq {
+  string ReqId = 1;
+  string Avatar = 2;
+  string Firstname = 3;
+  string Secondname = 4;
 }

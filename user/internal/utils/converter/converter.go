@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"fmt"
 	"github.com/MaksKazantsev/Chatter/user/internal/models"
 	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 )
@@ -15,6 +16,7 @@ type ToPb interface {
 	LoginResToPb(access, refresh string) *pkg.LoginRes
 	VerifyCodeResToPb(access, refresh string) *pkg.VerifyRes
 	UpdateTokensResToPb(access, refresh string) *pkg.UpdateTokenRes
+	GetFsToPb([]models.FsReq) *pkg.GetFsRes
 	ParseTokenResToPb(uuid string) *pkg.ParseTokenRes
 }
 
@@ -25,10 +27,9 @@ type ToService interface {
 	VerifyCodeReqToService(req *pkg.VerifyReq) (string, string, string)
 	RecoveryReqToService(req *pkg.RecoveryReq) models.Credentials
 	UpdateTokensReqToService(req *pkg.UpdateTokenReq) string
-	SuggestFriendShipToService(req *pkg.SuggestFriendShipReq) models.FriendShipReq
-	RefuseFriendShipToService(req *pkg.RefuseFriendShipReq) models.RefuseFriendShipReq
 	ParseTokenReqToService(req *pkg.ParseTokenReq) string
 	UpdateOnlineReqToService(req *pkg.UpdateOnlineReq) string
+	EditProfileReqToService(req *pkg.EditProfileReq, id string) models.UserProfile
 }
 
 func NewConverter() Converter {
@@ -36,6 +37,37 @@ func NewConverter() Converter {
 }
 
 type converter struct {
+}
+
+func (c converter) GetFsToPb(reqs []models.FsReq) *pkg.GetFsRes {
+	var res []*pkg.FsReq
+
+	fmt.Println(reqs)
+
+	for i := 0; i < len(reqs); i++ {
+		req := &pkg.FsReq{
+			ReqId:      reqs[i].ReqID,
+			Avatar:     reqs[i].Avatar,
+			Firstname:  reqs[i].Firstname,
+			Secondname: reqs[i].Secondname,
+		}
+		res = append(res, req)
+	}
+	return &pkg.GetFsRes{
+		FsReqs: res,
+	}
+}
+
+func (c converter) EditProfileReqToService(req *pkg.EditProfileReq, id string) models.UserProfile {
+	return models.UserProfile{
+		UUID:       id,
+		Avatar:     req.Avatar,
+		Birthday:   req.Birthday.AsTime(),
+		Bio:        req.Bio,
+		Firstname:  req.Firstname,
+		Secondname: req.Secondname,
+		Username:   req.Username,
+	}
 }
 
 func (c converter) UpdateOnlineReqToService(req *pkg.UpdateOnlineReq) string {
@@ -48,14 +80,6 @@ func (c converter) ParseTokenResToPb(uuid string) *pkg.ParseTokenRes {
 
 func (c converter) ParseTokenReqToService(req *pkg.ParseTokenReq) string {
 	return req.Token
-}
-
-func (c converter) RefuseFriendShipToService(req *pkg.RefuseFriendShipReq) models.RefuseFriendShipReq {
-	return models.RefuseFriendShipReq{Token: req.Token, Sender: req.Sender}
-}
-
-func (c converter) SuggestFriendShipToService(req *pkg.SuggestFriendShipReq) models.FriendShipReq {
-	return models.FriendShipReq{Token: req.Token, Receiver: req.Receiver}
 }
 
 func (c converter) UpdateTokensResToPb(access, refresh string) *pkg.UpdateTokenRes {

@@ -5,10 +5,10 @@ import (
 )
 
 type Service struct {
-	Auth       *Auth
-	Friendship *Friendship
+	Auth *Auth
+	User *User
 }
 
 func NewService(repo db.Repository) *Service {
-	return &Service{Auth: NewAuth(repo), Friendship: NewFriendShip(repo)}
+	return &Service{Auth: NewAuth(repo), User: NewUser(repo)}
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	Friendship
+	User
 	Auth
 }
 
@@ -20,7 +20,11 @@ type Auth interface {
 	GetHashAndID(ctx context.Context, email string) (HashAndID, error)
 	UpdateOnline(ctx context.Context, uuid string) error
 }
-type Friendship interface {
+type User interface {
+	EditProfile(ctx context.Context, profile models.UserProfile) error
+	SuggestFs(ctx context.Context, reqID, receiverID, senderID string) error
+	RefuseFs(ctx context.Context, reqID, receiverID string) error
+	GetFs(ctx context.Context, receiverID string) ([]models.FsReq, error)
 }
 
 type HashAndID struct {

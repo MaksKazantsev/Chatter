@@ -30,9 +30,11 @@ type UserClient interface {
 	Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateToken(ctx context.Context, in *UpdateTokenReq, opts ...grpc.CallOption) (*UpdateTokenRes, error)
 	ParseToken(ctx context.Context, in *ParseTokenReq, opts ...grpc.CallOption) (*ParseTokenRes, error)
-	SuggestFriendShip(ctx context.Context, in *SuggestFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	RefuseFriendShip(ctx context.Context, in *RefuseFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateOnline(ctx context.Context, in *UpdateOnlineReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SuggestFs(ctx context.Context, in *SuggestFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RefuseFs(ctx context.Context, in *RefuseFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetFs(ctx context.Context, in *GetFsReq, opts ...grpc.CallOption) (*GetFsRes, error)
 }
 
 type userClient struct {
@@ -106,18 +108,9 @@ func (c *userClient) ParseToken(ctx context.Context, in *ParseTokenReq, opts ...
 	return out, nil
 }
 
-func (c *userClient) SuggestFriendShip(ctx context.Context, in *SuggestFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *userClient) EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/User/SuggestFriendShip", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *userClient) RefuseFriendShip(ctx context.Context, in *RefuseFriendShipReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/User/RefuseFriendShip", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/User/EditProfile", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -127,6 +120,33 @@ func (c *userClient) RefuseFriendShip(ctx context.Context, in *RefuseFriendShipR
 func (c *userClient) UpdateOnline(ctx context.Context, in *UpdateOnlineReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/User/UpdateOnline", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) SuggestFs(ctx context.Context, in *SuggestFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/SuggestFs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) RefuseFs(ctx context.Context, in *RefuseFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/RefuseFs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetFs(ctx context.Context, in *GetFsReq, opts ...grpc.CallOption) (*GetFsRes, error) {
+	out := new(GetFsRes)
+	err := c.cc.Invoke(ctx, "/User/GetFs", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +164,11 @@ type UserServer interface {
 	Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error)
 	UpdateToken(context.Context, *UpdateTokenReq) (*UpdateTokenRes, error)
 	ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error)
-	SuggestFriendShip(context.Context, *SuggestFriendShipReq) (*emptypb.Empty, error)
-	RefuseFriendShip(context.Context, *RefuseFriendShipReq) (*emptypb.Empty, error)
+	EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error)
 	UpdateOnline(context.Context, *UpdateOnlineReq) (*emptypb.Empty, error)
+	SuggestFs(context.Context, *SuggestFsReq) (*emptypb.Empty, error)
+	RefuseFs(context.Context, *RefuseFsReq) (*emptypb.Empty, error)
+	GetFs(context.Context, *GetFsReq) (*GetFsRes, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -175,14 +197,20 @@ func (UnimplementedUserServer) UpdateToken(context.Context, *UpdateTokenReq) (*U
 func (UnimplementedUserServer) ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ParseToken not implemented")
 }
-func (UnimplementedUserServer) SuggestFriendShip(context.Context, *SuggestFriendShipReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SuggestFriendShip not implemented")
-}
-func (UnimplementedUserServer) RefuseFriendShip(context.Context, *RefuseFriendShipReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RefuseFriendShip not implemented")
+func (UnimplementedUserServer) EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditProfile not implemented")
 }
 func (UnimplementedUserServer) UpdateOnline(context.Context, *UpdateOnlineReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOnline not implemented")
+}
+func (UnimplementedUserServer) SuggestFs(context.Context, *SuggestFsReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SuggestFs not implemented")
+}
+func (UnimplementedUserServer) RefuseFs(context.Context, *RefuseFsReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RefuseFs not implemented")
+}
+func (UnimplementedUserServer) GetFs(context.Context, *GetFsReq) (*GetFsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFs not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -323,38 +351,20 @@ func _User_ParseToken_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_SuggestFriendShip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SuggestFriendShipReq)
+func _User_EditProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditProfileReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).SuggestFriendShip(ctx, in)
+		return srv.(UserServer).EditProfile(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/User/SuggestFriendShip",
+		FullMethod: "/User/EditProfile",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).SuggestFriendShip(ctx, req.(*SuggestFriendShipReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _User_RefuseFriendShip_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RefuseFriendShipReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).RefuseFriendShip(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/User/RefuseFriendShip",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).RefuseFriendShip(ctx, req.(*RefuseFriendShipReq))
+		return srv.(UserServer).EditProfile(ctx, req.(*EditProfileReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -373,6 +383,60 @@ func _User_UpdateOnline_Handler(srv interface{}, ctx context.Context, dec func(i
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(UserServer).UpdateOnline(ctx, req.(*UpdateOnlineReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_SuggestFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SuggestFsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).SuggestFs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/SuggestFs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).SuggestFs(ctx, req.(*SuggestFsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_RefuseFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RefuseFsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).RefuseFs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/RefuseFs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).RefuseFs(ctx, req.(*RefuseFsReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFsReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetFs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/GetFs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetFs(ctx, req.(*GetFsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -413,16 +477,24 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_ParseToken_Handler,
 		},
 		{
-			MethodName: "SuggestFriendShip",
-			Handler:    _User_SuggestFriendShip_Handler,
-		},
-		{
-			MethodName: "RefuseFriendShip",
-			Handler:    _User_RefuseFriendShip_Handler,
+			MethodName: "EditProfile",
+			Handler:    _User_EditProfile_Handler,
 		},
 		{
 			MethodName: "UpdateOnline",
 			Handler:    _User_UpdateOnline_Handler,
+		},
+		{
+			MethodName: "SuggestFs",
+			Handler:    _User_SuggestFs_Handler,
+		},
+		{
+			MethodName: "RefuseFs",
+			Handler:    _User_RefuseFs_Handler,
+		},
+		{
+			MethodName: "GetFs",
+			Handler:    _User_GetFs_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

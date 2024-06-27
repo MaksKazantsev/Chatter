@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user_profiles
     firstname text NOT NULL,
     secondname text NOT NULL,
     email text UNIQUE,
-    birthday text NOT NULL,
+    birthday date NOT NULL,
     bio text NOT NULL,
     lastonline TIMESTAMP
 );
@@ -28,6 +28,9 @@ CREATE TABLE IF NOT EXISTS codes
 );
 CREATE TABLE IF NOT EXISTS friend_reqs
 (
-    sender text UNIQUE,
-    receiver text
+    receiverid text NOT NULL,
+    requestid text UNIQUE,
+    avatar text NOT NULL,
+    firstname text NOT NULL,
+    secondname text NOT NULL
 );
