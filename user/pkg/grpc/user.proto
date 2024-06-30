@@ -14,13 +14,38 @@ service User {
   rpc UpdateToken(UpdateTokenReq) returns (UpdateTokenRes);
   rpc ParseToken(ParseTokenReq) returns (ParseTokenRes);
 
-  rpc EditProfile(EditProfileReq) returns (google.protobuf.Empty);
   rpc SuggestFs(SuggestFsReq) returns (google.protobuf.Empty);
   rpc RefuseFs(RefuseFsReq) returns (google.protobuf.Empty);
   rpc AcceptFs(FsAction) returns (google.protobuf.Empty);
   rpc DeleteFriend(FsAction) returns (google.protobuf.Empty);
   rpc GetFriends(GetFsAction) returns (GetFriendsRes);
   rpc GetFs(GetFsAction) returns (GetFsRes);
+
+  rpc EditProfile(EditProfileReq) returns (google.protobuf.Empty);
+  rpc GetProfile(SimpleReq) returns (GetProfileRes);
+  rpc EditAvatar(EditAvatarReq) returns (google.protobuf.Empty);
+  rpc DeleteAvatar(DeleteAvatarReq) returns (google.protobuf.Empty);
+}
+
+message SimpleReq {
+  string Token = 1;
+  string TargetID = 2;
+}
+
+message GetProfileRes {
+  string Avatar = 1;
+  string Bio = 2;
+  string Username = 3;
+  google.protobuf.Timestamp Birthday = 4;
+}
+
+message DeleteAvatarReq {
+  string Token = 1;
+}
+
+message EditAvatarReq {
+  string Token = 1;
+  string Avatar = 2;
 }
 
 message RegisterReq {

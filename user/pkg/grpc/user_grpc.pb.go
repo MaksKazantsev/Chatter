@@ -30,13 +30,16 @@ type UserClient interface {
 	Recovery(ctx context.Context, in *RecoveryReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateToken(ctx context.Context, in *UpdateTokenReq, opts ...grpc.CallOption) (*UpdateTokenRes, error)
 	ParseToken(ctx context.Context, in *ParseTokenReq, opts ...grpc.CallOption) (*ParseTokenRes, error)
-	EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SuggestFs(ctx context.Context, in *SuggestFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RefuseFs(ctx context.Context, in *RefuseFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AcceptFs(ctx context.Context, in *FsAction, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteFriend(ctx context.Context, in *FsAction, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetFriends(ctx context.Context, in *GetFsAction, opts ...grpc.CallOption) (*GetFriendsRes, error)
 	GetFs(ctx context.Context, in *GetFsAction, opts ...grpc.CallOption) (*GetFsRes, error)
+	EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetProfile(ctx context.Context, in *SimpleReq, opts ...grpc.CallOption) (*GetProfileRes, error)
+	EditAvatar(ctx context.Context, in *EditAvatarReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteAvatar(ctx context.Context, in *DeleteAvatarReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type userClient struct {
@@ -110,15 +113,6 @@ func (c *userClient) ParseToken(ctx context.Context, in *ParseTokenReq, opts ...
 	return out, nil
 }
 
-func (c *userClient) EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/User/EditProfile", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userClient) SuggestFs(ctx context.Context, in *SuggestFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/User/SuggestFs", in, out, opts...)
@@ -173,6 +167,42 @@ func (c *userClient) GetFs(ctx context.Context, in *GetFsAction, opts ...grpc.Ca
 	return out, nil
 }
 
+func (c *userClient) EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/EditProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetProfile(ctx context.Context, in *SimpleReq, opts ...grpc.CallOption) (*GetProfileRes, error) {
+	out := new(GetProfileRes)
+	err := c.cc.Invoke(ctx, "/User/GetProfile", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) EditAvatar(ctx context.Context, in *EditAvatarReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/EditAvatar", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DeleteAvatar(ctx context.Context, in *DeleteAvatarReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/DeleteAvatar", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
@@ -184,13 +214,16 @@ type UserServer interface {
 	Recovery(context.Context, *RecoveryReq) (*emptypb.Empty, error)
 	UpdateToken(context.Context, *UpdateTokenReq) (*UpdateTokenRes, error)
 	ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error)
-	EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error)
 	SuggestFs(context.Context, *SuggestFsReq) (*emptypb.Empty, error)
 	RefuseFs(context.Context, *RefuseFsReq) (*emptypb.Empty, error)
 	AcceptFs(context.Context, *FsAction) (*emptypb.Empty, error)
 	DeleteFriend(context.Context, *FsAction) (*emptypb.Empty, error)
 	GetFriends(context.Context, *GetFsAction) (*GetFriendsRes, error)
 	GetFs(context.Context, *GetFsAction) (*GetFsRes, error)
+	EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error)
+	GetProfile(context.Context, *SimpleReq) (*GetProfileRes, error)
+	EditAvatar(context.Context, *EditAvatarReq) (*emptypb.Empty, error)
+	DeleteAvatar(context.Context, *DeleteAvatarReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -219,9 +252,6 @@ func (UnimplementedUserServer) UpdateToken(context.Context, *UpdateTokenReq) (*U
 func (UnimplementedUserServer) ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ParseToken not implemented")
 }
-func (UnimplementedUserServer) EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method EditProfile not implemented")
-}
 func (UnimplementedUserServer) SuggestFs(context.Context, *SuggestFsReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SuggestFs not implemented")
 }
@@ -239,6 +269,18 @@ func (UnimplementedUserServer) GetFriends(context.Context, *GetFsAction) (*GetFr
 }
 func (UnimplementedUserServer) GetFs(context.Context, *GetFsAction) (*GetFsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFs not implemented")
+}
+func (UnimplementedUserServer) EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditProfile not implemented")
+}
+func (UnimplementedUserServer) GetProfile(context.Context, *SimpleReq) (*GetProfileRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetProfile not implemented")
+}
+func (UnimplementedUserServer) EditAvatar(context.Context, *EditAvatarReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EditAvatar not implemented")
+}
+func (UnimplementedUserServer) DeleteAvatar(context.Context, *DeleteAvatarReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteAvatar not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -379,24 +421,6 @@ func _User_ParseToken_Handler(srv interface{}, ctx context.Context, dec func(int
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_EditProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EditProfileReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).EditProfile(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/User/EditProfile",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).EditProfile(ctx, req.(*EditProfileReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _User_SuggestFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SuggestFsReq)
 	if err := dec(in); err != nil {
@@ -505,6 +529,78 @@ func _User_GetFs_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_EditProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditProfileReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).EditProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/EditProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).EditProfile(ctx, req.(*EditProfileReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SimpleReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/GetProfile",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetProfile(ctx, req.(*SimpleReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_EditAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditAvatarReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).EditAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/EditAvatar",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).EditAvatar(ctx, req.(*EditAvatarReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DeleteAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAvatarReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DeleteAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/DeleteAvatar",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DeleteAvatar(ctx, req.(*DeleteAvatarReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -541,10 +637,6 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_ParseToken_Handler,
 		},
 		{
-			MethodName: "EditProfile",
-			Handler:    _User_EditProfile_Handler,
-		},
-		{
 			MethodName: "SuggestFs",
 			Handler:    _User_SuggestFs_Handler,
 		},
@@ -567,6 +659,22 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetFs",
 			Handler:    _User_GetFs_Handler,
+		},
+		{
+			MethodName: "EditProfile",
+			Handler:    _User_EditProfile_Handler,
+		},
+		{
+			MethodName: "GetProfile",
+			Handler:    _User_GetProfile_Handler,
+		},
+		{
+			MethodName: "EditAvatar",
+			Handler:    _User_EditAvatar_Handler,
+		},
+		{
+			MethodName: "DeleteAvatar",
+			Handler:    _User_DeleteAvatar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
