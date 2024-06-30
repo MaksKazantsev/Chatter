@@ -11,16 +11,16 @@ service User {
   rpc SendCode(SendReq) returns(google.protobuf.Empty);
   rpc VerifyCode(VerifyReq) returns(VerifyRes);
   rpc Recovery(RecoveryReq) returns (google.protobuf.Empty);
-
   rpc UpdateToken(UpdateTokenReq) returns (UpdateTokenRes);
   rpc ParseToken(ParseTokenReq) returns (ParseTokenRes);
 
-
   rpc EditProfile(EditProfileReq) returns (google.protobuf.Empty);
-  rpc UpdateOnline(UpdateOnlineReq) returns (google.protobuf.Empty);
   rpc SuggestFs(SuggestFsReq) returns (google.protobuf.Empty);
   rpc RefuseFs(RefuseFsReq) returns (google.protobuf.Empty);
-  rpc GetFs(GetFsReq) returns (GetFsRes);
+  rpc AcceptFs(FsAction) returns (google.protobuf.Empty);
+  rpc DeleteFriend(FsAction) returns (google.protobuf.Empty);
+  rpc GetFriends(GetFsAction) returns (GetFriendsRes);
+  rpc GetFs(GetFsAction) returns (GetFsRes);
 }
 
 message RegisterReq {
@@ -80,16 +80,10 @@ message ParseTokenRes{
   string UUID = 1;
 }
 
-message UpdateOnlineReq {
-  string UUID = 1;
-}
-
 message EditProfileReq {
   string Token = 1;
   string Avatar = 2;
   string Username = 3;
-  string Firstname = 4;
-  string Secondname = 5;
   google.protobuf.Timestamp Birthday = 6;
   string Bio = 7;
 }
@@ -103,15 +97,29 @@ message RefuseFsReq {
   string Token = 1;
   string SenderID = 2;
 }
-message GetFsReq {
+message GetFsAction {
   string Token = 1;
 }
+
+message GetFriendsRes {
+  repeated Friend Friends = 1;
+}
+
+message Friend {
+  string FriendID = 1;
+  string Avatar = 2;
+  string Username = 3;
+}
+
 message GetFsRes {
   repeated FsReq FsReqs = 1;
 }
 message FsReq {
   string ReqId = 1;
   string Avatar = 2;
-  string Firstname = 3;
-  string Secondname = 4;
+  string Username = 3;
+}
+message FsAction {
+  string Token = 1;
+  string TargetID = 2;
 }

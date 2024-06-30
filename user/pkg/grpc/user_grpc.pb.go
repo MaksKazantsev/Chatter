@@ -31,10 +31,12 @@ type UserClient interface {
 	UpdateToken(ctx context.Context, in *UpdateTokenReq, opts ...grpc.CallOption) (*UpdateTokenRes, error)
 	ParseToken(ctx context.Context, in *ParseTokenReq, opts ...grpc.CallOption) (*ParseTokenRes, error)
 	EditProfile(ctx context.Context, in *EditProfileReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	UpdateOnline(ctx context.Context, in *UpdateOnlineReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SuggestFs(ctx context.Context, in *SuggestFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RefuseFs(ctx context.Context, in *RefuseFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	GetFs(ctx context.Context, in *GetFsReq, opts ...grpc.CallOption) (*GetFsRes, error)
+	AcceptFs(ctx context.Context, in *FsAction, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteFriend(ctx context.Context, in *FsAction, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetFriends(ctx context.Context, in *GetFsAction, opts ...grpc.CallOption) (*GetFriendsRes, error)
+	GetFs(ctx context.Context, in *GetFsAction, opts ...grpc.CallOption) (*GetFsRes, error)
 }
 
 type userClient struct {
@@ -117,15 +119,6 @@ func (c *userClient) EditProfile(ctx context.Context, in *EditProfileReq, opts .
 	return out, nil
 }
 
-func (c *userClient) UpdateOnline(ctx context.Context, in *UpdateOnlineReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/User/UpdateOnline", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *userClient) SuggestFs(ctx context.Context, in *SuggestFsReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/User/SuggestFs", in, out, opts...)
@@ -144,7 +137,34 @@ func (c *userClient) RefuseFs(ctx context.Context, in *RefuseFsReq, opts ...grpc
 	return out, nil
 }
 
-func (c *userClient) GetFs(ctx context.Context, in *GetFsReq, opts ...grpc.CallOption) (*GetFsRes, error) {
+func (c *userClient) AcceptFs(ctx context.Context, in *FsAction, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/AcceptFs", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) DeleteFriend(ctx context.Context, in *FsAction, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/User/DeleteFriend", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetFriends(ctx context.Context, in *GetFsAction, opts ...grpc.CallOption) (*GetFriendsRes, error) {
+	out := new(GetFriendsRes)
+	err := c.cc.Invoke(ctx, "/User/GetFriends", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userClient) GetFs(ctx context.Context, in *GetFsAction, opts ...grpc.CallOption) (*GetFsRes, error) {
 	out := new(GetFsRes)
 	err := c.cc.Invoke(ctx, "/User/GetFs", in, out, opts...)
 	if err != nil {
@@ -165,10 +185,12 @@ type UserServer interface {
 	UpdateToken(context.Context, *UpdateTokenReq) (*UpdateTokenRes, error)
 	ParseToken(context.Context, *ParseTokenReq) (*ParseTokenRes, error)
 	EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error)
-	UpdateOnline(context.Context, *UpdateOnlineReq) (*emptypb.Empty, error)
 	SuggestFs(context.Context, *SuggestFsReq) (*emptypb.Empty, error)
 	RefuseFs(context.Context, *RefuseFsReq) (*emptypb.Empty, error)
-	GetFs(context.Context, *GetFsReq) (*GetFsRes, error)
+	AcceptFs(context.Context, *FsAction) (*emptypb.Empty, error)
+	DeleteFriend(context.Context, *FsAction) (*emptypb.Empty, error)
+	GetFriends(context.Context, *GetFsAction) (*GetFriendsRes, error)
+	GetFs(context.Context, *GetFsAction) (*GetFsRes, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -200,16 +222,22 @@ func (UnimplementedUserServer) ParseToken(context.Context, *ParseTokenReq) (*Par
 func (UnimplementedUserServer) EditProfile(context.Context, *EditProfileReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EditProfile not implemented")
 }
-func (UnimplementedUserServer) UpdateOnline(context.Context, *UpdateOnlineReq) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpdateOnline not implemented")
-}
 func (UnimplementedUserServer) SuggestFs(context.Context, *SuggestFsReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SuggestFs not implemented")
 }
 func (UnimplementedUserServer) RefuseFs(context.Context, *RefuseFsReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RefuseFs not implemented")
 }
-func (UnimplementedUserServer) GetFs(context.Context, *GetFsReq) (*GetFsRes, error) {
+func (UnimplementedUserServer) AcceptFs(context.Context, *FsAction) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AcceptFs not implemented")
+}
+func (UnimplementedUserServer) DeleteFriend(context.Context, *FsAction) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteFriend not implemented")
+}
+func (UnimplementedUserServer) GetFriends(context.Context, *GetFsAction) (*GetFriendsRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetFriends not implemented")
+}
+func (UnimplementedUserServer) GetFs(context.Context, *GetFsAction) (*GetFsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFs not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
@@ -369,24 +397,6 @@ func _User_EditProfile_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-func _User_UpdateOnline_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpdateOnlineReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(UserServer).UpdateOnline(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/User/UpdateOnline",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).UpdateOnline(ctx, req.(*UpdateOnlineReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _User_SuggestFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SuggestFsReq)
 	if err := dec(in); err != nil {
@@ -423,8 +433,62 @@ func _User_RefuseFs_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_AcceptFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FsAction)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).AcceptFs(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/AcceptFs",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).AcceptFs(ctx, req.(*FsAction))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_DeleteFriend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FsAction)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).DeleteFriend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/DeleteFriend",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).DeleteFriend(ctx, req.(*FsAction))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _User_GetFriends_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetFsAction)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetFriends(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/User/GetFriends",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetFriends(ctx, req.(*GetFsAction))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _User_GetFs_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetFsReq)
+	in := new(GetFsAction)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -436,7 +500,7 @@ func _User_GetFs_Handler(srv interface{}, ctx context.Context, dec func(interfac
 		FullMethod: "/User/GetFs",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).GetFs(ctx, req.(*GetFsReq))
+		return srv.(UserServer).GetFs(ctx, req.(*GetFsAction))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -481,16 +545,24 @@ var User_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _User_EditProfile_Handler,
 		},
 		{
-			MethodName: "UpdateOnline",
-			Handler:    _User_UpdateOnline_Handler,
-		},
-		{
 			MethodName: "SuggestFs",
 			Handler:    _User_SuggestFs_Handler,
 		},
 		{
 			MethodName: "RefuseFs",
 			Handler:    _User_RefuseFs_Handler,
+		},
+		{
+			MethodName: "AcceptFs",
+			Handler:    _User_AcceptFs_Handler,
+		},
+		{
+			MethodName: "DeleteFriend",
+			Handler:    _User_DeleteFriend_Handler,
+		},
+		{
+			MethodName: "GetFriends",
+			Handler:    _User_GetFriends_Handler,
 		},
 		{
 			MethodName: "GetFs",
