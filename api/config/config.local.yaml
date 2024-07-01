@@ -5,3 +5,4 @@ services:
   authAddr: localhost:3001
   messagesAddr: localhost:3002
   filesAddr: localhost:3003
+  postsAddr: localhost:3004

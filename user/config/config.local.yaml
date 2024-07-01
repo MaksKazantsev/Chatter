@@ -6,4 +6,7 @@ db:
   password: postgres
   user: postgres
   name: user
+broker:
+  addr: localhost:29092
+  topic: update_online
   

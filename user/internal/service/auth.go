@@ -182,12 +182,12 @@ func (a *Auth) EmailSendCode(ctx context.Context, email string) error {
 	return nil
 }
 
-func (a *Auth) EmailVerifyCode(ctx context.Context, code, email, t string) (string, string, error) {
+func (a *Auth) EmailVerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, string, error) {
 	// logging
 	log.GetLogger(ctx).Debug("Service layer success")
 
 	// calling repo method
-	id, err := a.repo.EmailVerifyCode(ctx, code, email, t)
+	id, err := a.repo.EmailVerifyCode(ctx, req)
 	if err != nil {
 		return "", "", fmt.Errorf("repo error: %w", err)
 	}
@@ -235,7 +235,7 @@ func (a *Auth) ParseToken(ctx context.Context, token string) (string, error) {
 
 func (a *Auth) UpdateOnline(ctx context.Context, uuid string) error {
 	// logging
-	log.GetLogger(ctx).Debug("Service layer success")
+	log.GetLogger(ctx).Debug("Service layer success total")
 	if err := a.repo.UpdateOnline(ctx, uuid); err != nil {
 		return fmt.Errorf("repo error: %w", err)
 	}

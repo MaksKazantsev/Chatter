@@ -1,4 +1,4 @@
-package broker
+package producer
 
 import "github.com/IBM/sarama"
 

@@ -8,3 +8,6 @@ db:
   password: postgres
   user: postgres
   name: messages
+broker:
+  addr: localhost:29092
+  topic: updateonline

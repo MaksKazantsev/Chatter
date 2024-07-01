@@ -36,8 +36,8 @@ func (p *Postgres) Register(ctx context.Context, req models.RegReq) error {
 	}
 
 	// Creating user profile
-	q = `INSERT INTO user_profiles (uuid,avatar,username,email,birthday,bio,lastonline,firstname,secondname) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9)`
-	_, err = tx.Exec(q, req.UUID, "", req.Username, req.Email, time.Time{}, "", time.Now(), "", "")
+	q = `INSERT INTO user_profiles (uuid,avatar,username,email,birthday,bio,lastonline) VALUES($1,$2,$3,$4,$5,$6,$7)`
+	_, err = tx.Exec(q, req.UUID, "", req.Username, req.Email, time.Time{}, "", time.Now())
 	if err != nil {
 		_ = tx.Rollback()
 		return utils.NewError(err.Error(), utils.ErrInternal)
@@ -79,11 +79,11 @@ func (p *Postgres) EmailAddCode(ctx context.Context, code, email string) error {
 	return nil
 }
 
-func (p *Postgres) EmailVerifyCode(ctx context.Context, code, email, t string) (string, error) {
-	switch t {
+func (p *Postgres) EmailVerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, error) {
+	switch req.Type {
 	case VERIFICATION:
 		q := `DELETE FROM codes WHERE code = $1 AND email = $2`
-		_, err := p.Exec(q, code, email)
+		_, err := p.Exec(q, req.Code, req.Email)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return "", utils.NewError("wrong code or email provided", utils.ErrNotFound)
@@ -92,7 +92,7 @@ func (p *Postgres) EmailVerifyCode(ctx context.Context, code, email, t string) (
 		}
 	case RECOVERY:
 		q := `UPDATE codes SET isverified = $1 WHERE email = $2 AND code = $3`
-		_, err := p.Exec(q, true, email, code)
+		_, err := p.Exec(q, true, req.Email, req.Code)
 		if err != nil {
 			if errors.Is(err, sql.ErrNoRows) {
 				return "", utils.NewError("wrong code or email provided", utils.ErrNotFound)
@@ -104,14 +104,14 @@ func (p *Postgres) EmailVerifyCode(ctx context.Context, code, email, t string) (
 	}
 
 	q := `UPDATE users SET isverified = $1 WHERE email = $2`
-	_, err := p.Exec(q, true, email)
+	_, err := p.Exec(q, true, req.Email)
 	if err != nil {
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}
 
 	q = `SELECT uuid FROM users WHERE email = $1`
 	var uuid string
-	err = p.QueryRow(q, email).Scan(&uuid)
+	err = p.QueryRow(q, req.Email).Scan(&uuid)
 	if err != nil {
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}

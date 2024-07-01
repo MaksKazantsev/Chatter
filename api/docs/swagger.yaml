@@ -1,0 +1,792 @@
+definitions:
+  models.LoginReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.Message:
+    properties:
+      receiverID:
+        type: string
+      value:
+        type: string
+    type: object
+  models.ProfileAvatar:
+    properties:
+      avatar:
+        type: string
+    type: object
+  models.RecoveryReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  models.SignupReq:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  models.UserProfileReq:
+    properties:
+      avatar:
+        type: string
+      bio:
+        type: string
+      birthday:
+        example: "2024-03-11T14:30:00Z"
+        type: string
+    type: object
+info:
+  contact: {}
+  title: Social server API
+  version: "1.0"
+paths:
+  /auth/email/send:
+    get:
+      description: Send code to user verification/password recovery
+      parameters:
+      - description: user email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: SendCode
+      tags:
+      - Auth
+  /auth/email/verify:
+    get:
+      description: User email code verification
+      parameters:
+      - description: verification type
+        in: query
+        name: type
+        required: true
+        type: string
+      - description: code
+        in: query
+        name: code
+        required: true
+        type: string
+      - description: user email
+        in: query
+        name: email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: VerifyCode
+      tags:
+      - Auth
+  /auth/login:
+    put:
+      description: Login to system
+      parameters:
+      - description: user credentials
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Login
+      tags:
+      - Auth
+  /auth/recovery:
+    put:
+      description: Reset user password, requires verified email by VerifyCode
+      parameters:
+      - description: recovery request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.RecoveryReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: PasswordRecovery
+      tags:
+      - Auth
+  /auth/refresh:
+    get:
+      description: Update user's token pair
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: UpdateTokens
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      description: Register new user
+      parameters:
+      - description: user model
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.SignupReq'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Register
+      tags:
+      - Auth
+  /chat/history/{targetID}:
+    get:
+      description: Get chat history
+      parameters:
+      - description: user id
+        in: path
+        name: targetID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GetHistory
+      tags:
+      - Chat
+  /chat/message/{id}:
+    delete:
+      description: Delete message
+      parameters:
+      - description: user id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: DeleteMessage
+      tags:
+      - Chat
+  /chat/ws/join:
+    get:
+      description: Join chat room via WebSocket
+      parameters:
+      - description: user id
+        in: query
+        name: id
+        required: true
+        type: string
+      - description: message
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.Message'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Join
+      tags:
+      - Chat
+  /files/upload:
+    post:
+      description: Upload file to cloud storage
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: Upload
+      tags:
+      - Files
+  /user/friends/accept/{targetID}:
+    get:
+      description: Accept friendship request
+      parameters:
+      - description: SenderID
+        in: path
+        name: targetID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: AcceptFs
+      tags:
+      - User
+  /user/friends/delete/{targetID}:
+    delete:
+      description: Get all user's friends requests
+      parameters:
+      - description: UserID to delete from friends
+        in: path
+        name: targetID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: DeleteFriend
+      tags:
+      - User
+  /user/friends/get:
+    get:
+      description: Get something from friends section
+      parameters:
+      - description: section
+        in: query
+        name: section
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GetFriendsSection
+      tags:
+      - User
+  /user/friends/refuse/{targetID}:
+    get:
+      description: Refuse friendship request
+      parameters:
+      - description: SenderID
+        in: path
+        name: targetID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: RefuseFs
+      tags:
+      - User
+  /user/friends/suggest/{targetID}:
+    post:
+      description: Suggest friendship to user
+      parameters:
+      - description: UserID to suggest
+        in: path
+        name: targetID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: SuggestFs
+      tags:
+      - User
+  /user/profile/{targetID}:
+    get:
+      description: Get user's profile
+      parameters:
+      - description: user's id
+        in: path
+        name: targetID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GetProfile
+      tags:
+      - User
+  /user/profile/avatar/delete:
+    delete:
+      description: Delete user's avatar
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: DeleteAvatar
+      tags:
+      - User
+  /user/profile/avatar/edit:
+    put:
+      description: Edit user's avatar
+      parameters:
+      - description: user's new avatar
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.ProfileAvatar'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: EditAvatar
+      tags:
+      - User
+  /user/profile/edit:
+    put:
+      description: Edit user profile
+      parameters:
+      - description: edit request
+        in: body
+        name: input
+        schema:
+          $ref: '#/definitions/models.UserProfileReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: EditProfile
+      tags:
+      - User
+swagger: "2.0"

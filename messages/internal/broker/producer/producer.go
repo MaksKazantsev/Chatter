@@ -1,4 +1,4 @@
-package broker
+package producer
 
 import (
 	"context"
@@ -39,5 +39,5 @@ func (a AsyncProducer) Produce(ctx context.Context, message any) {
 		log.GetLogger(ctx).Error("failed to unmarshal", slog.Any("error", err.Error()))
 	}
 
-	k.AsyncProducer.Input() <- &sarama.ProducerMessage{Value: sarama.StringEncoder(b), Topic: k.topic}
+	a.AsyncProducer.Input() <- &sarama.ProducerMessage{Value: sarama.StringEncoder(b), Topic: a.topic}
 }

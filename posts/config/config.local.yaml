@@ -1,0 +1,10 @@
+port: 3004
+env: local
+services:
+  authAddr: localhost:3001
+db:
+  port: 4004
+  host: localhost
+  password: postgres
+  user: postgres
+  name: posts

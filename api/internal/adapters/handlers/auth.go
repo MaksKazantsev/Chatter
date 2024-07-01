@@ -6,7 +6,6 @@ import (
 	"github.com/MaksKazantsev/Chatter/api/internal/utils"
 	"github.com/gofiber/fiber/v2"
 	"net/http"
-	"strings"
 )
 
 type User struct {
@@ -17,6 +16,19 @@ func NewUser(cl clients.User) *User {
 	return &User{cl: cl}
 }
 
+// Register godoc
+// @Summary Register
+// @Description Register new user
+// @Tags Auth
+// @Produce json
+// @Param input body models.SignupReq true "user model"
+//
+//	@Success        201 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /auth/register [post]
 func (u *User) Register(c *fiber.Ctx) error {
 	var body models.SignupReq
 	if err := c.BodyParser(&body); err != nil {
@@ -34,6 +46,19 @@ func (u *User) Register(c *fiber.Ctx) error {
 	return nil
 }
 
+// Login godoc
+// @Summary Login
+// @Description Login to system
+// @Tags Auth
+// @Produce json
+// @Param input body models.LoginReq true "user credentials"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /auth/login [put]
 func (u *User) Login(c *fiber.Ctx) error {
 	var body models.LoginReq
 	if err := c.BodyParser(&body); err != nil {
@@ -50,6 +75,19 @@ func (u *User) Login(c *fiber.Ctx) error {
 	return nil
 }
 
+// SendCode godoc
+// @Summary SendCode
+// @Description Send code to user verification/password recovery
+// @Tags Auth
+// @Produce json
+// @Param email query string true "user email"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /auth/email/send [get]
 func (u *User) SendCode(c *fiber.Ctx) error {
 	email := c.Query("email")
 	if email == "" {
@@ -64,6 +102,21 @@ func (u *User) SendCode(c *fiber.Ctx) error {
 	return nil
 }
 
+// VerifyCode godoc
+// @Summary VerifyCode
+// @Description User email code verification
+// @Tags Auth
+// @Produce json
+// @Param type query string true "verification type"
+// @Param code query string true "code"
+// @Param email query string true "user email"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /auth/email/verify [get]
 func (u *User) VerifyCode(c *fiber.Ctx) error {
 	var body models.VerifyCodeReq
 	t, cd, email := c.Query("type"), c.Query("code"), c.Query("email")
@@ -82,10 +135,24 @@ func (u *User) VerifyCode(c *fiber.Ctx) error {
 		_ = c.Status(code).SendString(msg)
 		return nil
 	}
+
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
 	return nil
 }
 
+// PasswordRecovery godoc
+// @Summary PasswordRecovery
+// @Description Reset user password, requires verified email by VerifyCode
+// @Tags Auth
+// @Produce json
+// @Param input body models.RecoveryReq true "recovery request"
+//
+//	@Success        201 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /auth/recovery [put]
 func (u *User) PasswordRecovery(c *fiber.Ctx) error {
 	var body models.RecoveryReq
 	if err := c.BodyParser(&body); err != nil {
@@ -101,6 +168,19 @@ func (u *User) PasswordRecovery(c *fiber.Ctx) error {
 	return nil
 }
 
+// UpdateTokens godoc
+// @Summary UpdateTokens
+// @Description Update user's token pair
+// @Tags Auth
+// @Produce json
+// @Param Authorization header string true "token"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /auth/refresh [get]
 func (u *User) UpdateTokens(c *fiber.Ctx) error {
 	refresh := parseAuthHeader(c)
 	if refresh == "" {
@@ -114,21 +194,5 @@ func (u *User) UpdateTokens(c *fiber.Ctx) error {
 		return nil
 	}
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
-	return nil
-}
-
-func (u *User) ParseToken(c *fiber.Ctx) error {
-	auth := c.Get("Authorization")
-	vals := strings.Split(auth, ",")
-	if len(vals) != 2 {
-		c.Status(http.StatusMethodNotAllowed).SendString("token is not provided")
-		return nil
-	}
-	_, err := u.cl.ParseToken(c.Context(), vals[1])
-	if err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
-		return nil
-	}
 	return nil
 }

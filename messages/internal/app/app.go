@@ -8,6 +8,7 @@ import (
 	"github.com/MaksKazantsev/Chatter/messages/internal/log"
 	"github.com/MaksKazantsev/Chatter/messages/internal/server"
 	"github.com/MaksKazantsev/Chatter/messages/internal/service"
+	"github.com/joho/godotenv"
 	"google.golang.org/grpc"
 	"log/slog"
 	"net"
@@ -20,6 +21,11 @@ func MustStart(cfg *config.Config) {
 	// New logger example
 	l := log.InitLogger(cfg.Env)
 	l.Info("Logger init success")
+
+	// Load env
+	if err := godotenv.Load(".env"); err != nil {
+		panic("failed to load env file: " + err.Error())
+	}
 
 	// New db example
 	repo := repository.NewRepository(repository.MustConnect(cfg.DB.GetAddr()))

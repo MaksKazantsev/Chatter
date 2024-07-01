@@ -31,11 +31,8 @@ func MustStart(cfg *config.Config) {
 	// Clients connection
 	cl := userService.Connect(cfg.Services)
 
-	// New S3 storage
-	strg := s3.NewStorage()
-
 	// New service example
-	srvc := service.NewService(repo, strg)
+	srvc := service.NewService(repo, s3.NewStorage())
 
 	// New GRPC server
 	srv := server.NewServer(srvc, l, cl)

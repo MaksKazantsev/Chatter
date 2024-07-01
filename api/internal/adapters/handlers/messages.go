@@ -24,9 +24,24 @@ func NewMessages(cl clients.Messages) *Messages {
 	return &Messages{cl: cl, conns: make(map[string]*websocket.Conn)}
 }
 
+// Join godoc
+// @Summary Join
+// @Description Join chat room via WebSocket
+// @Tags Chat
+// @Produce json
+// @Param id query string true "user id"
+// @Param input body models.Message true "message"
+// @Param Authorization header string true "token"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /chat/ws/join [get]
 func (m *Messages) Join(c *websocket.Conn) {
 	id := c.Query("id")
-	token := c.Query("token")
+	token := parseWSAuthHeader(c)
 
 	m.mu.Lock()
 	m.conns[id] = c
@@ -69,6 +84,20 @@ func (m *Messages) Join(c *websocket.Conn) {
 	}
 }
 
+// DeleteMessage godoc
+// @Summary DeleteMessage
+// @Description Delete message
+// @Tags Chat
+// @Produce json
+// @Param id path string true "user id"
+// @Param Authorization header string true "token"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /chat/message/{id} [delete]
 func (m *Messages) DeleteMessage(c *fiber.Ctx) error {
 	token := parseAuthHeader(c)
 	id := c.Params("id")
@@ -83,10 +112,24 @@ func (m *Messages) DeleteMessage(c *fiber.Ctx) error {
 	return nil
 }
 
+// GetHistory godoc
+// @Summary GetHistory
+// @Description Get chat history
+// @Tags Chat
+// @Produce json
+// @Param targetID path string true "user id"
+// @Param Authorization header string true "token"
+//
+//	@Success        200 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /chat/history/{targetID} [get]
 func (m *Messages) GetHistory(c *fiber.Ctx) error {
 	var req models.GetHistoryReq
 	req.Token = parseAuthHeader(c)
-	req.ChatID = c.Params("receiverID")
+	req.ChatID = c.Params("targetID")
 
 	messages, err := m.cl.GetHistory(c.Context(), req)
 	if err != nil {

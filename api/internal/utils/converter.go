@@ -5,10 +5,12 @@ import (
 	filesPkg "github.com/MaksKazantsev/Chatter/files/pkg/grpc"
 	messagesPkg "github.com/MaksKazantsev/Chatter/messages/pkg/grpc"
 	userPkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 type Converter interface {
 	ToPb
+	ToService
 }
 
 func NewConverter() Converter {
@@ -29,10 +31,59 @@ type ToPb interface {
 	CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq
 	GetHistoryToPb(req models.GetHistoryReq) *messagesPkg.GetHistoryReq
 	UploadToPb(req models.UploadReq) *filesPkg.UploadReq
+	EditProfileToPb(req models.UserProfileReq) *userPkg.EditProfileReq
+}
+
+type ToService interface {
 	MessageToService(messages []*messagesPkg.Message) []models.Message
+	GetFriendsToService(friends []*userPkg.Friend) []models.Friend
+	GetFsToService(reqs []*userPkg.FsReq) []models.FsReq
+	GetProfileToService(req *userPkg.GetProfileRes) models.UserProfile
 }
 
 // User Microservice
+
+func (c converter) GetProfileToService(req *userPkg.GetProfileRes) models.UserProfile {
+	return models.UserProfile{
+		Avatar:     req.Avatar,
+		Bio:        req.Bio,
+		Birthday:   req.Birthday.AsTime(),
+		LastOnline: req.LastOnline.AsTime(),
+		Username:   req.Username,
+	}
+}
+
+func (c converter) EditProfileToPb(req models.UserProfileReq) *userPkg.EditProfileReq {
+	return &userPkg.EditProfileReq{Token: req.Token, Avatar: req.Avatar, Bio: req.Bio, Birthday: timestamppb.New(*req.Birthday)}
+}
+
+func (c converter) GetFsToService(reqs []*userPkg.FsReq) []models.FsReq {
+	var res []models.FsReq
+
+	for _, v := range reqs {
+		req := models.FsReq{
+			ReqID:    v.ReqId,
+			Username: v.Username,
+			Avatar:   v.Avatar,
+		}
+		res = append(res, req)
+	}
+	return res
+}
+
+func (c converter) GetFriendsToService(friends []*userPkg.Friend) []models.Friend {
+	var res []models.Friend
+
+	for _, v := range friends {
+		fr := models.Friend{
+			FriendID: v.FriendID,
+			Username: v.Username,
+			Avatar:   v.Avatar,
+		}
+		res = append(res, fr)
+	}
+	return res
+}
 
 func (c converter) RecoveryReqToPb(req models.RecoveryReq) *userPkg.RecoveryReq {
 	return &userPkg.RecoveryReq{

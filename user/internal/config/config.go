@@ -9,9 +9,10 @@ import (
 )
 
 type Config struct {
-	Port string   `yaml:"port"`
-	Env  string   `yaml:"env"`
-	DB   Postgres `yaml:"db"`
+	Port   string   `yaml:"port"`
+	Env    string   `yaml:"env"`
+	DB     Postgres `yaml:"db"`
+	Broker Broker   `yaml:"broker"`
 }
 
 type Postgres struct {
@@ -20,6 +21,11 @@ type Postgres struct {
 	Password string `yaml:"password"`
 	User     string `yaml:"user"`
 	Name     string `yaml:"name"`
+}
+
+type Broker struct {
+	Addr  string `yaml:"addr"`
+	Topic string `yaml:"topic"`
 }
 
 func (p *Postgres) GetAddr() string {

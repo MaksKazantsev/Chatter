@@ -17,6 +17,19 @@ func NewFiles(cl clients.Files) *Files {
 	return &Files{cl: cl}
 }
 
+// Upload godoc
+// @Summary Upload
+// @Description Upload file to cloud storage
+// @Tags Files
+// @Produce json
+// @Param Authorization header string true "token"
+//
+//	@Success        201 {object} int
+//	@Failure        400 {object} string
+//	@Failure        404 {object} string
+//	@Failure        405 {object} string
+//	@Failure        500 {object} string
+//	@Router         /files/upload [post]
 func (f *Files) Upload(c *fiber.Ctx) error {
 	token := parseAuthHeader(c)
 

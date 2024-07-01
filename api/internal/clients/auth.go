@@ -2,7 +2,6 @@ package clients
 
 import (
 	"context"
-	"fmt"
 	"github.com/MaksKazantsev/Chatter/api/internal/models"
 	"github.com/MaksKazantsev/Chatter/api/internal/utils"
 
@@ -16,20 +15,23 @@ type User interface {
 	VerifyCode(ctx context.Context, req models.VerifyCodeReq) (string, string, error)
 	PasswordRecovery(ctx context.Context, req models.RecoveryReq) error
 	UpdateTokens(ctx context.Context, refresh string) (string, string, error)
-	ParseToken(ctx context.Context, token string) (string, error)
+
+	GetFriends(ctx context.Context, token string) ([]models.Friend, error)
+	GetFs(ctx context.Context, token string) ([]models.FsReq, error)
+	DeleteFriend(ctx context.Context, token, targetID string) error
+	SuggestFs(ctx context.Context, token string, targetID string) error
+	RefuseFs(ctx context.Context, token string, targetID string) error
+	AcceptFs(ctx context.Context, token string, targetID string) error
+
+	EditProfile(ctx context.Context, req models.UserProfileReq) error
+	GetProfile(ctx context.Context, token, targetID string) (models.UserProfile, error)
+	EditAvatar(ctx context.Context, token, avatar string) error
+	DeleteAvatar(ctx context.Context, token string) error
 }
 
 type userCl struct {
 	cl pkg.UserClient
 	c  utils.Converter
-}
-
-func (u userCl) ParseToken(ctx context.Context, token string) (string, error) {
-	res, err := u.cl.ParseToken(ctx, u.c.ParseTokenToPb(token))
-	if err != nil {
-		return "", utils.GRPCErrorToError(err)
-	}
-	return res.UUID, nil
 }
 
 func (u userCl) UpdateTokens(ctx context.Context, refresh string) (string, string, error) {
@@ -65,7 +67,6 @@ func (u userCl) SendCode(ctx context.Context, email string) error {
 }
 
 func (u userCl) Register(ctx context.Context, req models.SignupReq) (string, string, error) {
-	fmt.Println("1")
 	res, err := u.cl.Register(ctx, u.c.RegReqToPb(req))
 	if err != nil {
 		return "", "", utils.GRPCErrorToError(err)

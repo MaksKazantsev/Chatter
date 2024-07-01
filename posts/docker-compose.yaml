@@ -1,0 +1,17 @@
+services:
+  postgres:
+    container_name: posts_postgres
+    image: postgres
+    restart: on-failure
+    ports:
+      - 4004:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: posts
+    volumes:
+      - data:/etc/data/postgres/posts_postgres
+
+
+volumes:
+  data:

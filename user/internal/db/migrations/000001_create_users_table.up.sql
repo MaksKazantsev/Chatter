@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS user_profiles
     uuid varchar(50) UNIQUE,
     avatar text NOT NULL,
     username text NOT NULL,
-    firstname text NOT NULL,
-    secondname text NOT NULL,
     email text UNIQUE,
     birthday date NOT NULL,
     bio text NOT NULL,
@@ -31,6 +29,12 @@ CREATE TABLE IF NOT EXISTS friend_reqs
     receiverid text NOT NULL,
     requestid text UNIQUE,
     avatar text NOT NULL,
-    firstname text NOT NULL,
-    secondname text NOT NULL
+    username text NOT NULL
+);
+CREATE TABLE IF NOT EXISTS friends
+(
+  uuid text NOT NULL,
+  friendid text NOT NULL,
+  avatar text NOT NULL,
+  username text NOT NULL
 );

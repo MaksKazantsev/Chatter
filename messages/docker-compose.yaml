@@ -1,4 +1,5 @@
 services:
+
   postgres:
     container_name: messages_postgres
     image: postgres

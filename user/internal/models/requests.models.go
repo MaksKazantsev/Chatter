@@ -27,3 +27,9 @@ type AcceptFriendShipReq struct {
 	Token  string
 	Sender string
 }
+
+type VerifyCodeReq struct {
+	Code  string
+	Email string
+	Type  string
+}

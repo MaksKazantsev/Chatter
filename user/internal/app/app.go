@@ -25,9 +25,11 @@ func MustStart(cfg *config.Config) {
 	defer func() {
 		_ = repo.Close()
 	}()
+	l.Info("Database layer set up")
 
 	// New service example
 	srvc := service.NewService(repo)
+	l.Info("Service layer set up")
 
 	// New GRPC server
 	srv := server.NewServer(l, srvc)

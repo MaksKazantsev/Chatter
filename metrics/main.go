@@ -1,1 +1,5 @@
-package metrics
+package main
+
+func main() {
+	// TODO: metrics
+}

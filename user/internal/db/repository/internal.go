@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/MaksKazantsev/Chatter/user/internal/db"
+	"github.com/MaksKazantsev/Chatter/user/internal/log"
 	"github.com/MaksKazantsev/Chatter/user/internal/utils"
 )
 
@@ -19,6 +20,8 @@ func (p *Postgres) GetHashAndID(ctx context.Context, email string) (db.HashAndID
 		}
 		return db.HashAndID{}, utils.NewError(err.Error(), utils.ErrInternal)
 	}
+
+	log.GetLogger(ctx).Debug("Internal: Database layer success")
 	return res, nil
 }
 
@@ -28,5 +31,7 @@ func (p *Postgres) UpdateRToken(ctx context.Context, id, rToken string) error {
 	if err != nil {
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
+
+	log.GetLogger(ctx).Debug("Internal: Database layer success")
 	return nil
 }

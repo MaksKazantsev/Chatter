@@ -13,6 +13,7 @@ type Config struct {
 	Env      string   `yaml:"env"`
 	DB       Postgres `yaml:"db"`
 	Services Services `yaml:"services"`
+	Broker   Broker   `yaml:"broker"`
 }
 
 type Postgres struct {
@@ -21,6 +22,11 @@ type Postgres struct {
 	Password string `yaml:"password"`
 	User     string `yaml:"user"`
 	Name     string `yaml:"name"`
+}
+
+type Broker struct {
+	Addr  string `yaml:"addr"`
+	Topic string `yaml:"topic"`
 }
 
 type Services struct {

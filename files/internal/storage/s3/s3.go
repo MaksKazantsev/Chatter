@@ -15,23 +15,13 @@ type Strg struct {
 	cl *minio.Client
 }
 
-func (s Strg) Upload(ctx context.Context, id string, val []byte) (string, error) {
-	godotenv.Load(".env")
-
-	accessKey := os.Getenv("AWS_ACCESS_KEY")
-	secretKey := os.Getenv("AWS_SECRET_KEY")
+func (s *Strg) Upload(ctx context.Context, id string, val []byte) (string, error) {
 	bucketName := "b9b14e14-29afa9b5-ceb5-4e04-b798-0b903a19130d"
-	fmt.Println(accessKey)
-
-	cl, err := minio.New("s3.timeweb.cloud", accessKey, secretKey, false)
-	if err != nil {
-		return "", utils.NewError(err.Error(), utils.ErrInternal)
-	}
-	exists, err := cl.BucketExists(bucketName)
+	exists, err := s.cl.BucketExists(bucketName)
 	if err != nil || !exists {
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}
-	_, err = cl.PutObject(bucketName, id, bytes.NewReader(val), int64(len(val)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
+	_, err = s.cl.PutObject(bucketName, id, bytes.NewReader(val), int64(len(val)), minio.PutObjectOptions{ContentType: "application/octet-stream"})
 	if err != nil {
 		return "", utils.NewError(err.Error(), utils.ErrInternal)
 	}
@@ -42,7 +32,7 @@ func (s Strg) Upload(ctx context.Context, id string, val []byte) (string, error)
 var _ storage.Storage = &Strg{}
 
 func NewStorage() *Strg {
-	godotenv.Load(".env")
+	_ = godotenv.Load(".env")
 	cl, err := minio.New("s3.timeweb.cloud", os.Getenv("AWS_ACCESS_KEY"), os.Getenv("AWS_SECRET_KEY"), false)
 
 	if err != nil {
