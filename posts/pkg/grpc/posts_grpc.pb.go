@@ -27,6 +27,9 @@ type PostsClient interface {
 	DeletePost(ctx context.Context, in *DeletePostReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	EditPost(ctx context.Context, in *EditPostReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetUserPosts(ctx context.Context, in *GetUserPostsReq, opts ...grpc.CallOption) (*GetUserPostsRes, error)
+	LikePost(ctx context.Context, in *LikePostReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	LeaveComment(ctx context.Context, in *LeaveCommentReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteComment(ctx context.Context, in *DeleteCommentReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type postsClient struct {
@@ -73,6 +76,33 @@ func (c *postsClient) GetUserPosts(ctx context.Context, in *GetUserPostsReq, opt
 	return out, nil
 }
 
+func (c *postsClient) LikePost(ctx context.Context, in *LikePostReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Posts/LikePost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postsClient) LeaveComment(ctx context.Context, in *LeaveCommentReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Posts/LeaveComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *postsClient) DeleteComment(ctx context.Context, in *DeleteCommentReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Posts/DeleteComment", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PostsServer is the server API for Posts service.
 // All implementations must embed UnimplementedPostsServer
 // for forward compatibility
@@ -81,6 +111,9 @@ type PostsServer interface {
 	DeletePost(context.Context, *DeletePostReq) (*emptypb.Empty, error)
 	EditPost(context.Context, *EditPostReq) (*emptypb.Empty, error)
 	GetUserPosts(context.Context, *GetUserPostsReq) (*GetUserPostsRes, error)
+	LikePost(context.Context, *LikePostReq) (*emptypb.Empty, error)
+	LeaveComment(context.Context, *LeaveCommentReq) (*emptypb.Empty, error)
+	DeleteComment(context.Context, *DeleteCommentReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedPostsServer()
 }
 
@@ -99,6 +132,15 @@ func (UnimplementedPostsServer) EditPost(context.Context, *EditPostReq) (*emptyp
 }
 func (UnimplementedPostsServer) GetUserPosts(context.Context, *GetUserPostsReq) (*GetUserPostsRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserPosts not implemented")
+}
+func (UnimplementedPostsServer) LikePost(context.Context, *LikePostReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LikePost not implemented")
+}
+func (UnimplementedPostsServer) LeaveComment(context.Context, *LeaveCommentReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LeaveComment not implemented")
+}
+func (UnimplementedPostsServer) DeleteComment(context.Context, *DeleteCommentReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteComment not implemented")
 }
 func (UnimplementedPostsServer) mustEmbedUnimplementedPostsServer() {}
 
@@ -185,6 +227,60 @@ func _Posts_GetUserPosts_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Posts_LikePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikePostReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServer).LikePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Posts/LikePost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServer).LikePost(ctx, req.(*LikePostReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Posts_LeaveComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveCommentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServer).LeaveComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Posts/LeaveComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServer).LeaveComment(ctx, req.(*LeaveCommentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Posts_DeleteComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCommentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PostsServer).DeleteComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Posts/DeleteComment",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PostsServer).DeleteComment(ctx, req.(*DeleteCommentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Posts_ServiceDesc is the grpc.ServiceDesc for Posts service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -207,6 +303,18 @@ var Posts_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserPosts",
 			Handler:    _Posts_GetUserPosts_Handler,
+		},
+		{
+			MethodName: "LikePost",
+			Handler:    _Posts_LikePost_Handler,
+		},
+		{
+			MethodName: "LeaveComment",
+			Handler:    _Posts_LeaveComment_Handler,
+		},
+		{
+			MethodName: "DeleteComment",
+			Handler:    _Posts_DeleteComment_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

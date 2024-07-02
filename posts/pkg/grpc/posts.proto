@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/MaksKazantsev/Chatter/posts/pkg";
 
@@ -10,10 +11,33 @@ service Posts {
   rpc DeletePost(DeletePostReq) returns (google.protobuf.Empty);
   rpc EditPost(EditPostReq) returns (google.protobuf.Empty);
   rpc GetUserPosts(GetUserPostsReq) returns (GetUserPostsRes);
+
+  rpc LikePost(LikePostReq) returns (google.protobuf.Empty);
+  rpc LeaveComment(LeaveCommentReq) returns (google.protobuf.Empty);
+  rpc DeleteComment(DeleteCommentReq) returns (google.protobuf.Empty);
+}
+
+message DeleteCommentReq {
+  string Token = 1;
+  string CommentID = 2;
+}
+
+message LikePostReq {
+  string PostID = 1;
+  string Token = 2;
+}
+
+message LeaveCommentReq {
+  string Token = 1;
+  string PostID = 2;
+  CommentValue Value = 3;
 }
 
 message CreatePostReq {
   string Token = 1;
+  string Title = 2;
+  string Description = 3;
+  string File = 4;
 }
 message DeletePostReq {
   string Token = 1;
@@ -21,11 +45,43 @@ message DeletePostReq {
 }
 message EditPostReq {
   string Token = 1;
+  string PostID = 2;
+  string Title = 3;
+  string Description = 4;
+  string File = 5;
 }
 message GetUserPostsReq {
   string Token = 1;
+  string UserID = 2;
 }
 message GetUserPostsRes {
   repeated Post Posts = 1;
 }
-message Post {}
+message Post {
+  string UserID = 1;
+  string PostID = 2;
+  string Title = 3;
+  string Description = 4;
+  string File = 5;
+  repeated Like Likes = 6;
+  repeated Comment Comments = 7;
+  google.protobuf.Timestamp CreatedAt = 8;
+}
+
+message Comment {
+  string UserID = 1;
+  string PostID = 2;
+  string CommentID = 3;
+  CommentValue Value = 4;
+  google.protobuf.Timestamp CreatedAt = 5;
+}
+
+message CommentValue {
+  string TextValue = 1;
+  string File = 2;
+}
+
+message Like {
+  string UserID = 1;
+  string PostID = 2;
+}
