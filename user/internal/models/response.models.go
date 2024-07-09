@@ -5,8 +5,3 @@ type RegRes struct {
 	RefreshToken string `json:"refreshToken"`
 	AccessToken  string `json:"accessToken"`
 }
-
-type LogRes struct {
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
-}

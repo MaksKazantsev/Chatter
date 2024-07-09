@@ -10,7 +10,7 @@ type Smtp interface {
 }
 
 const (
-	sub  = "Email verification SYSTEM IO LICENSED"
+	sub  = "Email verification"
 	body = "Code: "
 )
 

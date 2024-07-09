@@ -3,62 +3,53 @@ package workers
 import (
 	"context"
 	"encoding/json"
-	"github.com/IBM/sarama"
+	"fmt"
+	"github.com/MaksKazantsev/Chatter/user/internal/async"
 	"github.com/MaksKazantsev/Chatter/user/internal/log"
-	"github.com/joho/godotenv"
-	"log/slog"
-	"os"
-)
-
-const (
-	UpdateOnlineEvent = "updateonline"
+	"github.com/MaksKazantsev/Chatter/user/internal/service"
 )
 
 type Message struct {
-	Data []byte
+	ID string `json:"id"`
 }
 
 type Worker interface {
-	Start(ctx context.Context)
+	Start(ctx context.Context, maxWorkers int)
 }
 
 type worker struct {
-	consumer sarama.Consumer
+	consumer async.Consumer
+	uc       *service.Auth
 }
 
-func NewWorker() Worker {
-	_ = godotenv.Load(".env")
-	c, err := sarama.NewConsumer([]string{os.Getenv("KAFKA_ADDR")}, sarama.NewConfig())
-	if err != nil {
-		panic("Failed to init consumer: " + err.Error())
-	}
-
-	return &worker{consumer: c}
+func NewWorker(cons async.Consumer, uc *service.Auth) Worker {
+	return &worker{consumer: cons, uc: uc}
 }
 
-func (w *worker) Start(ctx context.Context) {
-	partitions, _ := w.consumer.Partitions(UpdateOnlineEvent)
-	c, err := w.consumer.ConsumePartition(UpdateOnlineEvent, partitions[0], sarama.OffsetNewest)
-	if err != nil {
-		panic("Failed to consume: " + err.Error())
-	}
+func (w *worker) Start(ctx context.Context, maxWorkers int) {
+	l := log.GetLogger(ctx)
 
-	messagesCh := c.Messages()
-	logger := log.GetLogger(ctx)
+	fmt.Println(1)
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < maxWorkers; i++ {
 		go func() {
-			for msg := range messagesCh {
-				var m Message
-				if err = json.Unmarshal(msg.Value, &m); err != nil {
-					logger.Error("failed to unmarshal", slog.Any("error: ", err.Error()))
+			var id string
+			for msg := range w.consumer.Consume(ctx) {
+				if err := json.Unmarshal(msg, &id); err != nil {
+					l.Error("failed to unmarshal: ", err.Error())
 				}
-				// TODO: finish
+				if err := w.updateOnline(ctx, id); err != nil {
+					l.Error("failed to push message: ", err.Error())
+				}
 			}
 		}()
 	}
-	select {
-	case <-ctx.Done():
-		_ = w.consumer.Close()
+}
+
+func (w *worker) updateOnline(ctx context.Context, id string) error {
+	l := log.GetLogger(ctx)
+	if err := w.uc.UpdateOnline(ctx, id); err != nil {
+		l.Error("failed to update: ", err.Error())
 	}
+	return nil
 }

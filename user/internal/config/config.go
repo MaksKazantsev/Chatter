@@ -12,7 +12,7 @@ type Config struct {
 	Port   string   `yaml:"port"`
 	Env    string   `yaml:"env"`
 	DB     Postgres `yaml:"db"`
-	Broker Broker   `yaml:"broker"`
+	Worker Worker   `json:"worker"`
 }
 
 type Postgres struct {
@@ -23,9 +23,8 @@ type Postgres struct {
 	Name     string `yaml:"name"`
 }
 
-type Broker struct {
-	Addr  string `yaml:"addr"`
-	Topic string `yaml:"topic"`
+type Worker struct {
+	MaxWorkers int `yaml:"max_workers"`
 }
 
 func (p *Postgres) GetAddr() string {

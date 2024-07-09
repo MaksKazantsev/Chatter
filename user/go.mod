@@ -36,6 +36,7 @@ require (
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/pierrec/lz4/v4 v4.1.21 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
+	github.com/segmentio/kafka-go v0.4.47 // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.21.0 // indirect

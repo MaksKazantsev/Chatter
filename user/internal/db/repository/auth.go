@@ -170,7 +170,7 @@ func (p *Postgres) PasswordRecovery(ctx context.Context, cr models.Credentials) 
 }
 
 func (p *Postgres) UpdateOnline(ctx context.Context, uuid string) error {
-	q := `UPDATE users SET lastonline = $1 WHERE uuid = $2`
+	q := `UPDATE user_profiles SET lastonline = $1 WHERE uuid = $2`
 	_, err := p.Exec(q, time.Now(), uuid)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {

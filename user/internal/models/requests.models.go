@@ -14,20 +14,6 @@ type LogReq struct {
 	Refresh  string
 }
 
-type FriendShipReq struct {
-	Token    string
-	Receiver string
-}
-type RefuseFriendShipReq struct {
-	Token  string
-	Sender string
-}
-
-type AcceptFriendShipReq struct {
-	Token  string
-	Sender string
-}
-
 type VerifyCodeReq struct {
 	Code  string
 	Email string

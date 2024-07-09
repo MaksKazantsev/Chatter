@@ -6,14 +6,14 @@ services:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
     ports:
-      - 22181:2181
+      - "22181:2181"
 
   kafka:
     image: confluentinc/cp-kafka
     depends_on:
       - zookeeper
     ports:
-      - 29092:29092
+      - "29092:29092"
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -26,7 +26,7 @@ services:
     image: postgres
     restart: on-failure
     ports:
-      - 4001:5432
+      - "4001:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -34,7 +34,21 @@ services:
     volumes:
       - data:/etc/data/postgres/user_postgres
 
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq_user'
+    ports:
+      - "5671:5672"
+      - "15671:15672"
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - rabbitmq_go_net
 
+networks:
+  rabbitmq_go_net:
+    driver: bridge
 
 
 
