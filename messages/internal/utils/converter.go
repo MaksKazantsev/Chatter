@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"github.com/MaksKazantsev/Chatter/messages/internal/models"
 	messagesPkg "github.com/MaksKazantsev/Chatter/messages/pkg/grpc"
 	userPkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
@@ -41,8 +40,6 @@ func (c converter) MessageToPb(messages []models.Message) *messagesPkg.GetHistor
 		}
 		msgs = append(msgs, msg)
 	}
-
-	fmt.Println(msgs)
 
 	return &messagesPkg.GetHistoryRes{
 		Messages: msgs,

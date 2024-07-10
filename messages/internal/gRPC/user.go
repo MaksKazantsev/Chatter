@@ -1,4 +1,4 @@
-package grpc
+package gRPC
 
 import (
 	"context"
@@ -25,7 +25,7 @@ func NewUser(cl pkg.UserClient) User {
 func (u userCl) ParseToken(ctx context.Context, token string) (string, error) {
 	res, err := u.cl.ParseToken(ctx, u.c.ParseTokenToPb(token))
 	if err != nil {
-		return "", utils.HandleError(err)
+		return "", err
 	}
 	return res.UUID, nil
 }

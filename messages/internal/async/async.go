@@ -1,37 +1,36 @@
-package producer
+package async
 
 import (
 	"context"
 	"encoding/json"
-	"github.com/MaksKazantsev/Chatter/messages/internal/broker"
+	"github.com/MaksKazantsev/Chatter/messages/internal/log"
 	"github.com/segmentio/kafka-go"
-	"log"
 	"time"
 )
 
-var _ broker.Producer = &AsyncProducer{}
+var _ Producer = &producer{}
 
-type AsyncProducer struct {
+type producer struct {
 	*kafka.Writer
 	topic string
 }
 
-func NewProducer(addr string, topic string) *AsyncProducer {
+func NewProducer(addr string, topic string) Producer {
 	writer := &kafka.Writer{
 		Addr:         kafka.TCP(addr),
 		Topic:        topic,
 		Balancer:     &kafka.LeastBytes{},
 		WriteTimeout: 10 * time.Second,
+		Async:        true,
 	}
 
-	return &AsyncProducer{writer, topic}
+	return &producer{writer, topic}
 }
 
-func (a *AsyncProducer) Produce(ctx context.Context, message any) {
+func (a *producer) Produce(ctx context.Context, message any) {
 	b, err := json.Marshal(message)
 	if err != nil {
-		log.Fatal(err)
+		log.GetLogger(ctx).Error("producing error: ", err.Error())
 	}
-
 	err = a.WriteMessages(ctx, kafka.Message{Value: b})
 }

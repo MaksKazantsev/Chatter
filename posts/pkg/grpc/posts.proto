@@ -13,8 +13,16 @@ service Posts {
   rpc GetUserPosts(GetUserPostsReq) returns (GetUserPostsRes);
 
   rpc LikePost(LikePostReq) returns (google.protobuf.Empty);
+  rpc UnlikePost(LikePostReq) returns(google.protobuf.Empty);
   rpc LeaveComment(LeaveCommentReq) returns (google.protobuf.Empty);
   rpc DeleteComment(DeleteCommentReq) returns (google.protobuf.Empty);
+  rpc EditComment(EditCommentReq) returns (google.protobuf.Empty);
+}
+
+message EditCommentReq {
+  string Token = 1;
+  string CommentID = 2;
+  CommentValue Value = 3;
 }
 
 message DeleteCommentReq {

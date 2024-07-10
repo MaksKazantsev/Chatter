@@ -42,6 +42,9 @@ func HandleError(err error) error {
 		return status.Error(codes.PermissionDenied, e.Message)
 	case ErrBadRequest:
 		return status.Error(codes.InvalidArgument, e.Message)
+	case ErrInternal:
+		return status.Error(codes.Internal, err.Error())
+
 	default:
 		return status.Error(codes.Internal, fmt.Sprintf("Unexpected: %s", err.Error()))
 	}

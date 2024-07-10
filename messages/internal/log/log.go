@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+type Wrapper func(ctx context.Context) context.Context
+
 const LoggerKey = "loggerKey"
 
 type Logger struct {
@@ -26,6 +28,7 @@ func InitLogger(env string) Logger {
 func WithLogger(ctx context.Context, log Logger) context.Context {
 	return context.WithValue(ctx, LoggerKey, log)
 }
+
 func GetLogger(ctx context.Context) Logger {
 	return ctx.Value(LoggerKey).(Logger)
 }

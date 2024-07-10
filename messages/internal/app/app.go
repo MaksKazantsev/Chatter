@@ -2,6 +2,8 @@ package app
 
 import (
 	"fmt"
+	"github.com/MaksKazantsev/Chatter/messages/internal/async"
+	"github.com/MaksKazantsev/Chatter/messages/internal/cache"
 	"github.com/MaksKazantsev/Chatter/messages/internal/config"
 	"github.com/MaksKazantsev/Chatter/messages/internal/db/repository"
 	userService "github.com/MaksKazantsev/Chatter/messages/internal/grpc"
@@ -18,14 +20,14 @@ import (
 )
 
 func MustStart(cfg *config.Config) {
+	// Load .env
+	if err := godotenv.Load(); err != nil {
+		panic("failed to load env: " + err.Error())
+	}
+
 	// New logger example
 	l := log.InitLogger(cfg.Env)
 	l.Info("Logger init success")
-
-	// Load env
-	if err := godotenv.Load(".env"); err != nil {
-		panic("failed to load env file: " + err.Error())
-	}
 
 	// New db example
 	repo := repository.NewRepository(repository.MustConnect(cfg.DB.GetAddr()))
@@ -33,14 +35,18 @@ func MustStart(cfg *config.Config) {
 		_ = repo.Close()
 	}()
 
-	// Clients connection
+	// External communication
+	prod := async.NewProducer(os.Getenv("KAFKA_ADDR"), os.Getenv("KAFKA_TOPIC"))
 	cl := userService.Connect(cfg.Services)
 
 	// New service example
-	srvc := service.NewService(repo)
+	srvc := service.NewService(repo, prod)
+
+	// New Cache example
+	c := cache.NewRedis()
 
 	// New GRPC server
-	srv := server.NewServer(l, srvc, cl)
+	srv := server.NewServer(l, srvc, cl, c)
 	l.Info("All layers set up")
 
 	shutdown(func() {

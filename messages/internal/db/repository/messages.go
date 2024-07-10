@@ -2,8 +2,6 @@ package repository
 
 import (
 	"context"
-	"database/sql"
-	"errors"
 	"fmt"
 	"github.com/MaksKazantsev/Chatter/messages/internal/log"
 	"github.com/MaksKazantsev/Chatter/messages/internal/models"
@@ -49,7 +47,7 @@ func (p *Postgres) CreateMessage(ctx context.Context, msg *models.Message, recei
 
 	if receiverOffline {
 		q = `UPDATE chat_members SET missed = missed + 1 WHERE chatid = $1 AND userid = $2`
-		_, err = p.Exec(q, msg.ChatID, msg.SenderID)
+		_, err = p.Exec(q, msg.ChatID, msg.ReceiverID)
 		if err != nil {
 			return utils.NewError(err.Error(), utils.ErrInternal)
 		}
@@ -67,13 +65,15 @@ func (p *Postgres) CreateMessage(ctx context.Context, msg *models.Message, recei
 
 func (p *Postgres) DeleteMessage(ctx context.Context, messageID string) error {
 	q := `DELETE FROM messages WHERE messageid = $1`
-	_, err := p.Exec(q, messageID)
+	res, err := p.Exec(q, messageID)
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return utils.NewError("Message does not exist", utils.ErrNotFound)
-		}
 		return utils.NewError(err.Error(), utils.ErrInternal)
 	}
+	amount, _ := res.RowsAffected()
+	if amount == 0 {
+		return utils.NewError("message does not exist", utils.ErrNotFound)
+	}
+
 	log.GetLogger(ctx).Info("Database layer success")
 	return nil
 }
@@ -89,11 +89,13 @@ func (p *Postgres) GetHistory(ctx context.Context, req models.GetHistoryReq, uui
 		msgs = append(msgs, msg)
 	}
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return []models.Message{}, nil
-		}
 		return nil, utils.NewError(err.Error(), utils.ErrInternal)
 	}
+
+	if len(msgs) == 0 {
+		return []models.Message{}, nil
+	}
+
 	q = `UPDATE chat_members SET missed = 0 WHERE chatid = $1 AND userid = $2`
 	_, err = p.Exec(q, req.ChatID, uuid)
 	if err != nil {
