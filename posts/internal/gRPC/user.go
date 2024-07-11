@@ -1,8 +1,7 @@
-package grpc
+package gRPC
 
 import (
 	"context"
-	"github.com/MaksKazantsev/Chatter/posts/internal/utils"
 	pkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 )
 
@@ -21,7 +20,7 @@ func NewUser(cl pkg.UserClient) User {
 func (u userCl) ParseToken(ctx context.Context, token string) (string, error) {
 	res, err := u.cl.ParseToken(ctx, &pkg.ParseTokenReq{Token: token})
 	if err != nil {
-		return "", utils.HandleError(err)
+		return "", err
 	}
 	return res.UUID, nil
 }

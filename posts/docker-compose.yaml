@@ -1,4 +1,12 @@
 services:
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6000:6379'
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - ./data:/data
   postgres:
     container_name: posts_postgres
     image: postgres

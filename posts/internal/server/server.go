@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/MaksKazantsev/Chatter/posts/internal/cache"
 	userService "github.com/MaksKazantsev/Chatter/posts/internal/grpc"
 	"github.com/MaksKazantsev/Chatter/posts/internal/log"
 	"github.com/MaksKazantsev/Chatter/posts/internal/service"
@@ -17,10 +18,11 @@ type server struct {
 	c      converter.Converter
 	v      validator.Validator
 	userCl userService.Clients
+	cache  cache.Cache
 }
 
-func NewServer(l log.Logger, srvc *service.Service, userCl userService.Clients) *grpc.Server {
+func NewServer(l log.Logger, srvc *service.Service, userCl userService.Clients, cache cache.Cache) *grpc.Server {
 	srv := grpc.NewServer()
-	pkg.RegisterPostsServer(srv, &server{log: l, srvc: srvc, userCl: userCl, c: converter.NewConverter(), v: validator.NewValidator()})
+	pkg.RegisterPostsServer(srv, &server{log: l, srvc: srvc, userCl: userCl, c: converter.NewConverter(), v: validator.NewValidator(), cache: cache})
 	return srv
 }

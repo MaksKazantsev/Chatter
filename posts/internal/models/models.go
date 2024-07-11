@@ -3,19 +3,23 @@ package models
 import "time"
 
 type Post struct {
-	PostID          string
-	PostAuthorID    string
-	PostTitle       string
-	PostDescription string
-	PostFile        string
-	PostLikesAmount int32
-	CreatedAt       time.Time
+	PostID          string    `db:"postid"`
+	PostAuthorID    string    `db:"userid"`
+	PostTitle       string    `db:"posttitle"`
+	PostDescription string    `db:"postdesc"`
+	PostFile        string    `db:"postfile"`
+	PostLikesAmount int32     `db:"likesamount"`
+	CreatedAt       time.Time `db:"createdat"`
+	Comments        []Comment `db:"-"`
+	Likes           []Like    `db:"-"`
 }
 type Comment struct {
-	PostID    string
-	UserID    string
-	CommentID string
-	Value     CommentValue
+	PostID    string       `db:"postid"`
+	UserID    string       `db:"userid"`
+	CommentID string       `db:"commentid"`
+	CreatedAt time.Time    `db:"createdat"`
+	ValueDb   string       `db:"val"`
+	Value     CommentValue `db:"-"`
 }
 
 type CommentValue struct {
@@ -24,6 +28,6 @@ type CommentValue struct {
 }
 
 type Like struct {
-	PostID string
-	UserID string
+	PostID string `db:"postid"`
+	UserID string `db:"userid"`
 }

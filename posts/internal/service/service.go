@@ -1,11 +1,15 @@
 package service
 
-import "github.com/MaksKazantsev/Chatter/posts/internal/db"
+import (
+	"github.com/MaksKazantsev/Chatter/posts/internal/async"
+	"github.com/MaksKazantsev/Chatter/posts/internal/db"
+)
 
 type Service struct {
-	repo db.Repository
+	repo   db.Repository
+	broker async.Producer
 }
 
-func NewService(repo db.Repository) *Service {
-	return &Service{repo: repo}
+func NewService(repo db.Repository, broker async.Producer) *Service {
+	return &Service{repo: repo, broker: broker}
 }
