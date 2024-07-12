@@ -42,3 +42,34 @@ type UserProfile struct {
 type ProfileAvatar struct {
 	Avatar string `json:"avatar"`
 }
+
+type Post struct {
+	PostID          string    `json:"postID"`
+	PostAuthorID    string    `json:"postAuthorID"`
+	PostTitle       string    `json:"postTitle"`
+	PostDescription string    `json:"postDescription"`
+	PostFile        string    `json:"postFile"`
+	PostLikesAmount int32     `json:"postLikesAmount"`
+	CreatedAt       time.Time `json:"createdAt"`
+	Comments        []Comment `json:"comments"`
+	Likes           []Like    `json:"likes"`
+}
+
+type Comment struct {
+	PostID    string       `json:"postID"`
+	UserID    string       `json:"userID"`
+	CommentID string       `json:"commentID"`
+	CreatedAt time.Time    `json:"createdAt"`
+	ValueDb   string       `json:"-"`
+	Value     CommentValue `json:"value"`
+}
+
+type CommentValue struct {
+	TextValue string `json:"textValue"`
+	File      string `json:"file"`
+}
+
+type Like struct {
+	PostID string `json:"postID"`
+	UserID string `json:"userID"`
+}

@@ -3,7 +3,7 @@ module github.com/MaksKazantsev/Chatter/api
 go 1.22.1
 
 require (
-	github.com/MaksKazantsev/Chatter/files v0.0.0-20240626124007-60d5c9ef92b1
+	github.com/MaksKazantsev/Chatter/files v0.0.0-20240712200512-fc86ae4f1667
 	github.com/MaksKazantsev/Chatter/messages v0.0.0-20240626124007-60d5c9ef92b1
 	github.com/MaksKazantsev/Chatter/user v0.0.0-20240630182905-fd623d546efe
 	github.com/goccy/go-yaml v1.11.3
@@ -20,6 +20,7 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
+	github.com/MaksKazantsev/Chatter/posts v0.0.0-20240710084647-824ab2f875e8 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
 	github.com/andybalholm/brotli v1.1.0 // indirect

@@ -4,6 +4,7 @@ import (
 	"github.com/MaksKazantsev/Chatter/api/internal/models"
 	filesPkg "github.com/MaksKazantsev/Chatter/files/pkg/grpc"
 	messagesPkg "github.com/MaksKazantsev/Chatter/messages/pkg/grpc"
+	postsPkg "github.com/MaksKazantsev/Chatter/posts/pkg/grpc"
 	userPkg "github.com/MaksKazantsev/Chatter/user/pkg/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -31,7 +32,13 @@ type ToPb interface {
 	CreateMsgToPb(req *models.Message, receiverOffline bool) *messagesPkg.CreateMessageReq
 	GetHistoryToPb(req models.GetHistoryReq) *messagesPkg.GetHistoryReq
 	UploadToPb(req models.UploadReq) *filesPkg.UploadReq
+	UpdateAvatarToPb(req models.UploadReq) *filesPkg.UpdateAvatarReq
 	EditProfileToPb(req models.UserProfileReq) *userPkg.EditProfileReq
+	CreatePostToPb(req models.CreatePostReq) *postsPkg.CreatePostReq
+	EditPostToPb(req models.EditPostReq) *postsPkg.EditPostReq
+	LeaveCommentToPb(req models.LeaveCommentReq) *postsPkg.LeaveCommentReq
+	GetUserPostsToPb(token string, userID string) *postsPkg.GetUserPostsReq
+	EditCommentToPb(req models.EditCommentReq) *postsPkg.EditCommentReq
 }
 
 type ToService interface {
@@ -39,6 +46,7 @@ type ToService interface {
 	GetFriendsToService(friends []*userPkg.Friend) []models.Friend
 	GetFsToService(reqs []*userPkg.FsReq) []models.FsReq
 	GetProfileToService(req *userPkg.GetProfileRes) models.UserProfile
+	GetUserPostsToService(posts *postsPkg.GetUserPostsRes) []models.Post
 }
 
 // User Microservice
@@ -167,4 +175,67 @@ func (c converter) UploadToPb(req models.UploadReq) *filesPkg.UploadReq {
 		PhotoID: req.PhotoID,
 		Photo:   req.Photo,
 	}
+}
+
+// Posts microservice
+
+func (c converter) EditCommentToPb(req models.EditCommentReq) *postsPkg.EditCommentReq {
+	return &postsPkg.EditCommentReq{CommentID: req.CommentID, Token: req.Token, Value: &postsPkg.CommentValue{TextValue: req.Value.TextValue, File: req.Value.File}}
+}
+
+func (c converter) GetUserPostsToService(posts *postsPkg.GetUserPostsRes) []models.Post {
+	var res []models.Post
+
+	for _, p := range posts.Posts {
+		post := models.Post{}
+		for _, l := range p.Likes {
+			if p.PostID == l.PostID {
+				post.Likes = append(post.Likes, models.Like{UserID: l.UserID, PostID: l.PostID})
+			}
+		}
+		for _, co := range p.Comments {
+			if p.PostID == co.PostID {
+				post.Comments = append(post.Comments, models.Comment{UserID: co.UserID, PostID: co.PostID, CommentID: co.CommentID, Value: models.CommentValue{TextValue: co.Value.TextValue, File: co.Value.File}, CreatedAt: co.CreatedAt.AsTime()})
+			}
+		}
+		post.PostID = p.PostID
+		post.PostAuthorID = p.UserID
+		post.PostTitle = p.Title
+		post.PostDescription = p.Description
+		post.PostFile = p.File
+		post.CreatedAt = p.CreatedAt.AsTime()
+		res = append(res, post)
+	}
+	return res
+}
+
+func (c converter) GetUserPostsToPb(token string, userID string) *postsPkg.GetUserPostsReq {
+	return &postsPkg.GetUserPostsReq{UserID: userID, Token: token}
+}
+
+func (c converter) LeaveCommentToPb(req models.LeaveCommentReq) *postsPkg.LeaveCommentReq {
+	return &postsPkg.LeaveCommentReq{
+		PostID: req.PostID,
+		Token:  req.Token,
+		Value:  &postsPkg.CommentValue{TextValue: req.Value.TextValue, File: req.Value.File},
+	}
+}
+
+func (c converter) EditPostToPb(req models.EditPostReq) *postsPkg.EditPostReq {
+	return &postsPkg.EditPostReq{PostID: req.PostID, Token: req.Token, Title: req.Title, Description: req.Description, File: req.File}
+}
+
+func (c converter) CreatePostToPb(req models.CreatePostReq) *postsPkg.CreatePostReq {
+	return &postsPkg.CreatePostReq{
+		Token:       req.Token,
+		Title:       req.Title,
+		Description: req.Description,
+		File:        req.File,
+	}
+}
+
+// Files microservice
+
+func (c converter) UpdateAvatarToPb(req models.UploadReq) *filesPkg.UpdateAvatarReq {
+	return &filesPkg.UpdateAvatarReq{Token: req.Token, Photo: req.Photo, PhotoID: req.PhotoID}
 }

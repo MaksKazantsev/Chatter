@@ -15,12 +15,12 @@ import (
 )
 
 type Messages struct {
-	cl    clients.Messages
+	cl    clients.MessagesClient
 	conns map[string]*websocket.Conn
 	mu    sync.RWMutex
 }
 
-func NewMessages(cl clients.Messages) *Messages {
+func NewMessages(cl clients.MessagesClient) *Messages {
 	return &Messages{cl: cl, conns: make(map[string]*websocket.Conn)}
 }
 

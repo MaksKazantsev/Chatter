@@ -17,6 +17,7 @@ type Services struct {
 	AuthAddr     string `yaml:"authAddr" env-default:"127.0.0.1:3001"`
 	MessagesAddr string `yaml:"messagesAddr" env-default:"127.0.0.1:3002"`
 	FilesAddr    string `yaml:"filesAddr" env-default:"127.0.0.1:3003"`
+	PostsAddr    string `yaml:"postsAddr" env-default:"127.0.0.1:3004"`
 }
 
 func MustInit() *Config {

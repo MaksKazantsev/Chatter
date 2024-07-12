@@ -1,4 +1,48 @@
 definitions:
+  models.CommentValue:
+    properties:
+      file:
+        type: string
+      textValue:
+        type: string
+    type: object
+  models.CreatePostReq:
+    properties:
+      description:
+        type: string
+      file:
+        type: string
+      title:
+        type: string
+    type: object
+  models.EditCommentReq:
+    properties:
+      postID:
+        type: string
+      value:
+        $ref: '#/definitions/models.CommentValue'
+    type: object
+  models.EditPostReq:
+    properties:
+      description:
+        type: string
+      file:
+        type: string
+      title:
+        type: string
+    type: object
+  models.LeaveCommentReq:
+    properties:
+      postID:
+        type: string
+      value:
+        $ref: '#/definitions/models.CommentValue'
+    type: object
+  models.LikePostReq:
+    properties:
+      postID:
+        type: string
+    type: object
   models.LoginReq:
     properties:
       email:
@@ -131,7 +175,6 @@ paths:
       - Auth
   /auth/login:
     put:
-      description: Login to system
       parameters:
       - description: user credentials
         in: body
@@ -398,6 +441,41 @@ paths:
       summary: Join
       tags:
       - Chat
+  /files/update:
+    post:
+      description: Updates user's avatar
+      parameters:
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: UpdateAvatar
+      tags:
+      - Files
   /files/upload:
     post:
       description: Upload file to cloud storage
@@ -433,6 +511,128 @@ paths:
       summary: Upload
       tags:
       - Files
+  /user/comment/delete:
+    delete:
+      description: Delete comment
+      parameters:
+      - description: comment ID
+        in: path
+        name: commentID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: DeleteComment
+      tags:
+      - Post
+  /user/comment/edit:
+    put:
+      description: Edit your comment
+      parameters:
+      - description: edit comment req
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.EditCommentReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: EditComment
+      tags:
+      - Post
+  /user/comment/new:
+    post:
+      description: Leave new comment
+      parameters:
+      - description: leave comment req
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LeaveCommentReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: LeaveComment
+      tags:
+      - Post
   /user/friends/accept/{targetID}:
     get:
       description: Accept friendship request
@@ -633,6 +833,255 @@ paths:
       summary: SuggestFs
       tags:
       - User
+  /user/posts/create:
+    post:
+      description: Create new post
+      parameters:
+      - description: post request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.CreatePostReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: CreatePost
+      tags:
+      - Post
+  /user/posts/delete/{postID}:
+    delete:
+      description: Delete your post
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: DeletePost
+      tags:
+      - Post
+  /user/posts/dislike:
+    put:
+      description: Unlike user's post
+      parameters:
+      - description: dislike post request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LikePostReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: UnlikePost
+      tags:
+      - Post
+  /user/posts/edit:
+    put:
+      description: Edit your post
+      parameters:
+      - description: post ID
+        in: path
+        name: postID
+        required: true
+        type: string
+      - description: post request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.EditPostReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: EditPost
+      tags:
+      - Post
+  /user/posts/get/{userID}:
+    get:
+      description: Get users post
+      parameters:
+      - description: user ID
+        in: path
+        name: userID
+        required: true
+        type: string
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: GetUserPosts
+      tags:
+      - Post
+  /user/posts/like:
+    put:
+      description: Like post
+      parameters:
+      - description: like post request
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.LikePostReq'
+      - description: token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: integer
+        "400":
+          description: Bad Request
+          schema:
+            type: string
+        "404":
+          description: Not Found
+          schema:
+            type: string
+        "405":
+          description: Method Not Allowed
+          schema:
+            type: string
+        "500":
+          description: Internal Server Error
+          schema:
+            type: string
+      summary: LikePost
+      tags:
+      - Post
   /user/profile/{targetID}:
     get:
       description: Get user's profile

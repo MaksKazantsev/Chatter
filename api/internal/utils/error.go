@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"fmt"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"net/http"
@@ -29,7 +30,6 @@ func NewError(message string, code int) error {
 
 func HandleError(err error) (int, string) {
 	var e *Error
-
 	if !errors.As(err, &e) {
 		return http.StatusInternalServerError, err.Error()
 	}
@@ -42,7 +42,7 @@ func HandleError(err error) (int, string) {
 	case ERR_CLIENT_INVALID_ARGUMENT:
 		return http.StatusBadRequest, e.Message
 	default:
-		return http.StatusInternalServerError, "unexpected internal error"
+		return http.StatusInternalServerError, fmt.Sprintf("unexpected server internal error: %w", err)
 	}
 }
 

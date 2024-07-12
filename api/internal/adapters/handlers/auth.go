@@ -9,10 +9,10 @@ import (
 )
 
 type User struct {
-	cl clients.User
+	cl clients.UserClient
 }
 
-func NewUser(cl clients.User) *User {
+func NewUser(cl clients.UserClient) *User {
 	return &User{cl: cl}
 }
 
@@ -38,17 +38,17 @@ func (u *User) Register(c *fiber.Ctx) error {
 
 	aToken, rToken, err := u.cl.Register(c.Context(), body)
 	if err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
+		st, msg := utils.HandleError(err)
+		_ = c.Status(st).SendString(msg)
 		return nil
 	}
+
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
 	return nil
 }
 
 // Login godoc
 // @Summary Login
-// @Description Login to system
 // @Tags Auth
 // @Produce json
 // @Param input body models.LoginReq true "user credentials"
@@ -62,14 +62,15 @@ func (u *User) Register(c *fiber.Ctx) error {
 func (u *User) Login(c *fiber.Ctx) error {
 	var body models.LoginReq
 	if err := c.BodyParser(&body); err != nil {
-		c.Status(http.StatusBadRequest)
-		return nil
+		return utils.NewError(err.Error(), utils.ERR_CLIENT_INVALID_ARGUMENT)
 	}
 	aToken, rToken, err := u.cl.Login(c.Context(), body)
 	if err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
-		return nil
+		if err != nil {
+			st, msg := utils.HandleError(err)
+			_ = c.Status(st).SendString(msg)
+			return nil
+		}
 	}
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
 	return nil
@@ -91,12 +92,14 @@ func (u *User) Login(c *fiber.Ctx) error {
 func (u *User) SendCode(c *fiber.Ctx) error {
 	email := c.Query("email")
 	if email == "" {
-		_ = c.Status(http.StatusBadGateway).SendString("query parameter 'email' - is required")
+		return utils.NewError("query parameter 'email' - is required", utils.ERR_CLIENT_INVALID_ARGUMENT)
 	}
 	if err := u.cl.SendCode(c.Context(), email); err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
-		return nil
+		if err != nil {
+			st, msg := utils.HandleError(err)
+			_ = c.Status(st).SendString(msg)
+			return nil
+		}
 	}
 	c.Status(http.StatusOK)
 	return nil
@@ -122,7 +125,7 @@ func (u *User) VerifyCode(c *fiber.Ctx) error {
 	t, cd, email := c.Query("type"), c.Query("code"), c.Query("email")
 
 	if email == "" || cd == "" || t == " " {
-		_ = c.Status(http.StatusBadGateway).SendString("query parameters 'email,code,type' - is required")
+		return utils.NewError("query parameters 'email,code,type' - is required", utils.ERR_CLIENT_INVALID_ARGUMENT)
 	}
 
 	body.Code = cd
@@ -131,9 +134,11 @@ func (u *User) VerifyCode(c *fiber.Ctx) error {
 
 	aToken, rToken, err := u.cl.VerifyCode(c.Context(), body)
 	if err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
-		return nil
+		if err != nil {
+			st, msg := utils.HandleError(err)
+			_ = c.Status(st).SendString(msg)
+			return nil
+		}
 	}
 
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
@@ -156,13 +161,14 @@ func (u *User) VerifyCode(c *fiber.Ctx) error {
 func (u *User) PasswordRecovery(c *fiber.Ctx) error {
 	var body models.RecoveryReq
 	if err := c.BodyParser(&body); err != nil {
-		c.Status(http.StatusBadRequest)
-		return nil
+		return utils.NewError(err.Error(), utils.ERR_CLIENT_INVALID_ARGUMENT)
 	}
 	if err := u.cl.PasswordRecovery(c.Context(), body); err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
-		return nil
+		if err != nil {
+			st, msg := utils.HandleError(err)
+			_ = c.Status(st).SendString(msg)
+			return nil
+		}
 	}
 	c.Status(http.StatusOK)
 	return nil
@@ -184,14 +190,15 @@ func (u *User) PasswordRecovery(c *fiber.Ctx) error {
 func (u *User) UpdateTokens(c *fiber.Ctx) error {
 	refresh := parseAuthHeader(c)
 	if refresh == "" {
-		_ = c.Status(http.StatusBadRequest).SendString("no refresh token found")
-		return nil
+		return utils.NewError("refresh token not provided", utils.ERR_CLIENT_INVALID_ARGUMENT)
 	}
 	aToken, rToken, err := u.cl.UpdateTokens(c.Context(), refresh)
 	if err != nil {
-		code, msg := utils.HandleError(err)
-		_ = c.Status(code).SendString(msg)
-		return nil
+		if err != nil {
+			st, msg := utils.HandleError(err)
+			_ = c.Status(st).SendString(msg)
+			return nil
+		}
 	}
 	_ = c.Status(http.StatusCreated).JSON(fiber.Map{"token": aToken, "refreshToken": rToken})
 	return nil

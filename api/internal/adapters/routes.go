@@ -12,6 +12,7 @@ type Controller struct {
 	User     *handlers.User
 	Messages *handlers.Messages
 	Files    *handlers.Files
+	Posts    *handlers.Posts
 }
 
 func NewController(clients clients.Clients) *Controller {
@@ -19,13 +20,17 @@ func NewController(clients clients.Clients) *Controller {
 		User:     handlers.NewUser(clients.UserClient),
 		Messages: handlers.NewMessages(clients.MessagesClient),
 		Files:    handlers.NewFiles(clients.FilesClient),
+		Posts:    handlers.NewPosts(clients.PostsClient),
 	}
 }
 
 func InitRoutes(app *fiber.App, ctrl *Controller) {
 	app.Get("/chat/ws/join", websocket.New(ctrl.Messages.Join))
-	app.Post("/files/upload", ctrl.Files.Upload)
 	app.Get("/swagger/*", fiberSwagger.WrapHandler)
+
+	files := app.Group("/files")
+	files.Post("/files/upload", ctrl.Files.Upload)
+	files.Post("/files/update", ctrl.Files.UpdateAvatar)
 
 	auth := app.Group("/auth")
 	auth.Post("/register", ctrl.User.Register)
@@ -50,4 +55,15 @@ func InitRoutes(app *fiber.App, ctrl *Controller) {
 	user.Put("/profile/avatar/edit", ctrl.User.EditAvatar)
 	user.Delete("/profile/avatar/delete", ctrl.User.DeleteAvatar)
 	user.Get("/profile/:targetID", ctrl.User.GetProfile)
+
+	user.Post("/posts/create", ctrl.Posts.CreatePost)
+	user.Delete("/posts/delete/:postID", ctrl.Posts.DeletePost)
+	user.Put("/posts/edit/:postID", ctrl.Posts.EditPost)
+	user.Put("/posts/dislike", ctrl.Posts.UnlikePost)
+	user.Put("/posts/like", ctrl.Posts.LikePost)
+	user.Get("/posts/get/:userID", ctrl.Posts.GetUserPosts)
+
+	user.Post("/comment/new", ctrl.Posts.LeaveComment)
+	user.Put("/comment/edit", ctrl.Posts.EditComment)
+	user.Delete("/comment/delete/:commentID", ctrl.Posts.DeleteComment)
 }

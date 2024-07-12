@@ -3,8 +3,14 @@ github.com/KyleBanks/depth v1.2.1 h1:5h8fQADFrWtarTdtDudMmGsC7GPbOAu6RVB3ffsVFHc
 github.com/KyleBanks/depth v1.2.1/go.mod h1:jzSb9d0L43HxTQfT+oSA1EEp2q+ne2uh6XgeJcm8brE=
 github.com/MaksKazantsev/Chatter/files v0.0.0-20240626124007-60d5c9ef92b1 h1:2m7pR+XHRvzMWSi2XEwQBJAvX1YUbjbypWyt5hXVXM4=
 github.com/MaksKazantsev/Chatter/files v0.0.0-20240626124007-60d5c9ef92b1/go.mod h1:7DOMba3smAfcyw8i9DDTRfHAxy9U90fGqLmMyps3D3o=
+github.com/MaksKazantsev/Chatter/files v0.0.0-20240712200512-fc86ae4f1667 h1:ZWkkGYyfHRzcXwP+5JDtchSdajUzlDP5+vdrdL2lJzo=
+github.com/MaksKazantsev/Chatter/files v0.0.0-20240712200512-fc86ae4f1667/go.mod h1:LS6j4E+w9cLlnt/BwDKE71TcoJU0pH2FDht1wQV7GKI=
 github.com/MaksKazantsev/Chatter/messages v0.0.0-20240626124007-60d5c9ef92b1 h1:OtET28Xtt+FmmvbxWayPzY4pGpUcyFcy+MB9vix6sNg=
 github.com/MaksKazantsev/Chatter/messages v0.0.0-20240626124007-60d5c9ef92b1/go.mod h1:VA6r/qLuA4iwSfSAZUKdnRbiAcd9qAZNYnaK9EydSb0=
+github.com/MaksKazantsev/Chatter/posts v0.0.0-20240702121658-81347761c6b6 h1:0QSy5Ww3uD94+3QnLtWuU1NZWy01ipdbOpD6WNJXSU8=
+github.com/MaksKazantsev/Chatter/posts v0.0.0-20240702121658-81347761c6b6/go.mod h1:oI+pXxquw+21djnjG/YmBnrLvS1wtChFvyt5a6dYUcE=
+github.com/MaksKazantsev/Chatter/posts v0.0.0-20240710084647-824ab2f875e8 h1:rVrySr83Ouu9Y/InjYx1DzCfCjiIzobRkA+rwJ2ODRs=
+github.com/MaksKazantsev/Chatter/posts v0.0.0-20240710084647-824ab2f875e8/go.mod h1:oI+pXxquw+21djnjG/YmBnrLvS1wtChFvyt5a6dYUcE=
 github.com/MaksKazantsev/Chatter/user v0.0.0-20240630182905-fd623d546efe h1:9h8+HsCiAuo0rImX8j+IluknB7WSB/aL+Q1uaA+PuFQ=
 github.com/MaksKazantsev/Chatter/user v0.0.0-20240630182905-fd623d546efe/go.mod h1:qfopp3OHTbmIzx8XE2KHStHBovwdalC3WfiBs4AkMgw=
 github.com/PuerkitoBio/purell v1.1.1 h1:WEQqlqaGbrPkxLJWfBwQmfEAE1Z7ONdDLqrN38tNFfI=

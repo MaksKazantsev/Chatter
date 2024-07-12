@@ -45,3 +45,35 @@ type UploadReq struct {
 	Photo   []byte `json:"photo"`
 	Token   string `json:"token"`
 }
+
+type CreatePostReq struct {
+	Token       string `json:"-"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	File        string `json:"file"`
+}
+
+type EditPostReq struct {
+	Token       string `json:"-"`
+	PostID      string `json:"-"`
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	File        string `json:"file"`
+}
+
+type LeaveCommentReq struct {
+	Token  string       `json:"-"`
+	PostID string       `json:"postID"`
+	Value  CommentValue `json:"value"`
+}
+
+type EditCommentReq struct {
+	Token     string       `json:"-"`
+	CommentID string       `json:"postID"`
+	Value     CommentValue `json:"value"`
+}
+
+type LikePostReq struct {
+	Token  string `json:"-"`
+	PostID string `json:"postID"`
+}
