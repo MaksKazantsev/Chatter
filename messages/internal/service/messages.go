@@ -2,11 +2,13 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/MaksKazantsev/Chatter/messages/internal/async"
 	"github.com/MaksKazantsev/Chatter/messages/internal/db"
 	"github.com/MaksKazantsev/Chatter/messages/internal/log"
 	"github.com/MaksKazantsev/Chatter/messages/internal/models"
+	"github.com/MaksKazantsev/Chatter/messages/internal/utils"
 	"github.com/MaksKazantsev/Chatter/messages/pkg"
 	"github.com/google/uuid"
 	"sort"
@@ -33,7 +35,11 @@ func (m *Messages) CreateMessage(ctx context.Context, msg *models.Message, recei
 		return fmt.Errorf("repo error: %w", err)
 	}
 
-	m.broker.Produce(ctx, pkg.KafkaMessage{ID: msg.SenderID, LastOnline: time.Now()})
+	b, err := json.Marshal(pkg.UpdateOnlineMessage{ID: msg.SenderID, LastOnline: time.Now()})
+	if err != nil {
+		return utils.NewError("failed to marshal message to broker "+err.Error(), utils.ErrInternal)
+	}
+	m.broker.Produce(ctx, pkg.Message{Type: "UpdateOnline", Data: b})
 
 	return nil
 }
@@ -44,20 +50,28 @@ func (m *Messages) DeleteMessage(ctx context.Context, messageID, id string) erro
 		return fmt.Errorf("repo error: %w", err)
 	}
 
-	m.broker.Produce(ctx, pkg.KafkaMessage{ID: id, LastOnline: time.Now()})
+	b, err := json.Marshal(pkg.UpdateOnlineMessage{ID: id, LastOnline: time.Now()})
+	if err != nil {
+		return utils.NewError("failed to marshal message to broker "+err.Error(), utils.ErrInternal)
+	}
+	m.broker.Produce(ctx, pkg.Message{Type: "UpdateOnline", Data: b})
 	return nil
 }
 
-func (m *Messages) GetHistory(ctx context.Context, req models.GetHistoryReq, uuid string) ([]models.Message, error) {
+func (m *Messages) GetHistory(ctx context.Context, req models.GetHistoryReq, id string) ([]models.Message, error) {
 	log.GetLogger(ctx).Info("Service layer success")
 
-	m.broker.Produce(ctx, pkg.KafkaMessage{ID: uuid, LastOnline: time.Now()})
+	b, err := json.Marshal(pkg.UpdateOnlineMessage{ID: id, LastOnline: time.Now()})
+	if err != nil {
+		return nil, utils.NewError("failed to marshal message to broker "+err.Error(), utils.ErrInternal)
+	}
+	m.broker.Produce(ctx, pkg.Message{Type: "UpdateOnline", Data: b})
 
-	s := strings.Split(req.ChatID+uuid, "")
+	s := strings.Split(req.ChatID+id, "")
 	sort.Strings(s)
 	req.ChatID = strings.Join(s, "")
 
-	res, err := m.repo.GetHistory(ctx, req, uuid)
+	res, err := m.repo.GetHistory(ctx, req, id)
 
 	if err != nil {
 		return nil, fmt.Errorf("repo error: %w", err)

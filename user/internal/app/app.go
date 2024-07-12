@@ -41,7 +41,7 @@ func MustStart(cfg *config.Config) {
 	l.Info("Service layer set up")
 
 	// Init task workers
-	w := workers.NewWorker(async.NewConsumer(async.Kafka, os.Getenv("KAFKA_ADDR"), os.Getenv("KAFKA_TOPIC")), srvc.Auth)
+	w := workers.NewWorker(async.NewConsumer(async.Kafka, os.Getenv("KAFKA_ADDR"), os.Getenv("KAFKA_TOPIC")), async.NewConsumer(async.Rabbit, os.Getenv("RABBITMQ_ADDR"), os.Getenv("RABBITMQ_ROUTING_KEY")), srvc.User)
 
 	// New GRPC server
 	srv := server.NewServer(l, srvc)

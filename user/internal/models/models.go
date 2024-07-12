@@ -36,3 +36,13 @@ type FsReq struct {
 	Avatar   string `db:"avatar"`
 	Username string `db:"username"`
 }
+
+type UpdateOnlineMessage struct {
+	ID         string    `json:"id"`
+	LastOnline time.Time `json:"last_online"`
+}
+
+type UpdateAvatarMessage struct {
+	ID     string `json:"id"`
+	Avatar string `json:"avatar"`
+}

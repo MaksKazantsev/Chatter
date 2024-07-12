@@ -9,3 +9,8 @@ type Photo struct {
 	PhotoLink   string
 	CreatedAt   time.Time
 }
+
+type UpdateAvatarMessage struct {
+	ID     string `json:"id"`
+	Avatar string `json:"avatar"`
+}

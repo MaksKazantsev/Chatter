@@ -1,17 +1,17 @@
+
 services:
-  postgres:
-    container_name: files_postgres
-    image: postgres
-    restart: on-failure
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
     ports:
-      - 4003:5432
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: files
+      - 5672:5672
+      - 15672:15672
     volumes:
-      - data:/etc/data/postgres/files_postgres
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - rabbitmq_go_net
 
-
-volumes:
-  data:
+networks:
+  rabbitmq_go_net:
+    driver: bridge

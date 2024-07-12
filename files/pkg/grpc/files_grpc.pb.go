@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -23,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FilesClient interface {
 	UploadToStorage(ctx context.Context, in *UploadReq, opts ...grpc.CallOption) (*UploadRes, error)
+	UpdateAvatar(ctx context.Context, in *UpdateAvatarReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type filesClient struct {
@@ -42,11 +44,21 @@ func (c *filesClient) UploadToStorage(ctx context.Context, in *UploadReq, opts .
 	return out, nil
 }
 
+func (c *filesClient) UpdateAvatar(ctx context.Context, in *UpdateAvatarReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/Files/UpdateAvatar", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // FilesServer is the server API for Files service.
 // All implementations must embed UnimplementedFilesServer
 // for forward compatibility
 type FilesServer interface {
 	UploadToStorage(context.Context, *UploadReq) (*UploadRes, error)
+	UpdateAvatar(context.Context, *UpdateAvatarReq) (*emptypb.Empty, error)
 	mustEmbedUnimplementedFilesServer()
 }
 
@@ -56,6 +68,9 @@ type UnimplementedFilesServer struct {
 
 func (UnimplementedFilesServer) UploadToStorage(context.Context, *UploadReq) (*UploadRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadToStorage not implemented")
+}
+func (UnimplementedFilesServer) UpdateAvatar(context.Context, *UpdateAvatarReq) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateAvatar not implemented")
 }
 func (UnimplementedFilesServer) mustEmbedUnimplementedFilesServer() {}
 
@@ -88,6 +103,24 @@ func _Files_UploadToStorage_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Files_UpdateAvatar_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAvatarReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FilesServer).UpdateAvatar(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/Files/UpdateAvatar",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FilesServer).UpdateAvatar(ctx, req.(*UpdateAvatarReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Files_ServiceDesc is the grpc.ServiceDesc for Files service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -98,6 +131,10 @@ var Files_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UploadToStorage",
 			Handler:    _Files_UploadToStorage_Handler,
+		},
+		{
+			MethodName: "UpdateAvatar",
+			Handler:    _Files_UpdateAvatar_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

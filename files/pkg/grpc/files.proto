@@ -1,10 +1,20 @@
 syntax = "proto3";
 
 
+import "google/protobuf/empty.proto";
+
 option go_package = "github.com/MaksKazantsev/Chatter/files/pkg";
+
 
 service Files {
   rpc UploadToStorage(UploadReq) returns (UploadRes);
+  rpc UpdateAvatar(UpdateAvatarReq) returns (google.protobuf.Empty);
+}
+
+message UpdateAvatarReq {
+  string Token = 1;
+  string PhotoID = 2;
+  bytes Photo = 3;
 }
 
 message UploadReq {

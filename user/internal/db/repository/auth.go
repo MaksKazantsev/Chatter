@@ -169,9 +169,9 @@ func (p *Postgres) PasswordRecovery(ctx context.Context, cr models.Credentials) 
 	return tx.Commit()
 }
 
-func (p *Postgres) UpdateOnline(ctx context.Context, uuid string) error {
+func (p *Postgres) UpdateOnline(ctx context.Context, mes models.UpdateOnlineMessage) error {
 	q := `UPDATE user_profiles SET lastonline = $1 WHERE uuid = $2`
-	_, err := p.Exec(q, time.Now(), uuid)
+	_, err := p.Exec(q, mes.LastOnline, mes.ID)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return utils.NewError("user not found", utils.ErrNotFound)

@@ -8,6 +8,8 @@ import (
 
 const LoggerKey = "loggerKey"
 
+type Wrapper func(context.Context) context.Context
+
 type Logger struct {
 	*slog.Logger
 }

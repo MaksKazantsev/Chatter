@@ -18,9 +18,9 @@ type Auth interface {
 	PasswordRecovery(ctx context.Context, cr models.Credentials) error
 	UpdateRToken(ctx context.Context, id, rToken string) error
 	GetHashAndID(ctx context.Context, email string) (HashAndID, error)
-	UpdateOnline(ctx context.Context, uuid string) error
 }
 type User interface {
+	UpdateOnline(ctx context.Context, mes models.UpdateOnlineMessage) error
 	EditProfile(ctx context.Context, profile models.UserProfile) error
 	SuggestFs(ctx context.Context, reqID, receiverID, senderID string) error
 	RefuseFs(ctx context.Context, reqID, receiverID string) error

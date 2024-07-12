@@ -1,18 +1,18 @@
 package service
 
 import (
-	"github.com/MaksKazantsev/Chatter/files/internal/db"
+	"github.com/MaksKazantsev/Chatter/files/internal/async"
 	"github.com/MaksKazantsev/Chatter/files/internal/storage"
 )
 
 type Service struct {
-	repo db.Repository
-	s3   storage.Storage
+	s3     storage.Storage
+	broker async.Publisher
 }
 
-func NewService(repo db.Repository, strg storage.Storage) *Service {
+func NewService(strg storage.Storage, broker async.Publisher) *Service {
 	return &Service{
-		repo: repo,
-		s3:   strg,
+		s3:     strg,
+		broker: broker,
 	}
 }

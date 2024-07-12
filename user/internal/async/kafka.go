@@ -34,7 +34,6 @@ func (k *kafka) Consume(ctx context.Context) <-chan []byte {
 
 		for {
 			msg, err := k.consumer.ReadMessage(ctx)
-			fmt.Println(msg)
 			if err != nil {
 				_, _ = fmt.Fprintf(os.Stderr, "Error consuming: %v\n", err)
 				break
